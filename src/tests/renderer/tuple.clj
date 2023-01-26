@@ -25,3 +25,13 @@
               (test/is (tuple/isPoint (makeTestP)))
               (test/is (not (tuple/isPoint (makeTestV))))
               )
+
+(test/deftest testTupleEqual
+              (test/is (= (makeTestP) (makeTestP)))
+              (test/is (= (makeTestV) (makeTestV)))
+              (test/is (not (= (makeTestP) (makeTestV))))
+              (test/is (not (= (makeTestV) (makeTestP))))
+              (test/is (not (= (tuple/makePoint 4.0 -4.2 3.1) (makeTestP))))
+              (test/is (not (= (tuple/makePoint 4.3 -0.2 3.1) (makeTestP))))
+              (test/is (not (= (tuple/makePoint 4.3 -4.2 0.1) (makeTestP))))
+              )
