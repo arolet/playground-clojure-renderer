@@ -35,3 +35,8 @@
               (test/is (not (= (tuple/makePoint 4.3 -0.2 3.1) (makeTestP))))
               (test/is (not (= (tuple/makePoint 4.3 -4.2 0.1) (makeTestP))))
               )
+
+(test/deftest testTupleAdd
+              (test/is (= (tuple/makePoint 1 1 6) (tuple/add (tuple/makePoint 3 -2 5) (tuple/makeVector -2 3 1))))
+              (test/is (= (tuple/makePoint 1 1 6) (tuple/add (tuple/makePoint 3 -2 5) (tuple/makePoint -2 3 1))))
+              )
