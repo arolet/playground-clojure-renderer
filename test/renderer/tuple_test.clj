@@ -1,42 +1,42 @@
 (ns renderer.tuple_test
-    (:require [clojure.test :as test]
-      [renderer.tuple :as tuple]))
+    (:require [clojure.test :refer :all]
+      [renderer.tuple :refer :all]))
 
 (defn makeTestV []
-      (tuple/makeVector 4.3 -4.2 3.1))
+      (makeVector 4.3 -4.2 3.1))
 (defn makeTestP []
-      (tuple/makePoint 4.3 -4.2 3.1))
+      (makePoint 4.3 -4.2 3.1))
 
 
-(test/deftest testTupleConstructor
-              (test/is (= (:x (makeTestV) 4.3)))
-              (test/is (= (:y (makeTestV) -4.2)))
-              (test/is (= (:z (makeTestV) 3.1)))
-              (test/is (= (:w (makeTestV) 0.0)))
-              (test/is (= (:w (makeTestP) 1.0)))
+(deftest testTupleConstructor
+              (is (= (:x (makeTestV) 4.3)))
+              (is (= (:y (makeTestV) -4.2)))
+              (is (= (:z (makeTestV) 3.1)))
+              (is (= (:w (makeTestV) 0.0)))
+              (is (= (:w (makeTestP) 1.0)))
               )
 
-(test/deftest testIsVector
-              (test/is (tuple/isVector (makeTestV)))
-              (test/is (not (tuple/isVector (makeTestP))))
+(deftest testIsVector
+              (is (isVector (makeTestV)))
+              (is (not (isVector (makeTestP))))
               )
 
-(test/deftest testIsPoint
-              (test/is (tuple/isPoint (makeTestP)))
-              (test/is (not (tuple/isPoint (makeTestV))))
+(deftest testIsPoint
+              (is (isPoint (makeTestP)))
+              (is (not (isPoint (makeTestV))))
               )
 
-(test/deftest testTupleEqual
-              (test/is (= (makeTestP) (makeTestP)))
-              (test/is (= (makeTestV) (makeTestV)))
-              (test/is (not (= (makeTestP) (makeTestV))))
-              (test/is (not (= (makeTestV) (makeTestP))))
-              (test/is (not (= (tuple/makePoint 4.0 -4.2 3.1) (makeTestP))))
-              (test/is (not (= (tuple/makePoint 4.3 -0.2 3.1) (makeTestP))))
-              (test/is (not (= (tuple/makePoint 4.3 -4.2 0.1) (makeTestP))))
+(deftest testTupleEqual
+              (is (= (makeTestP) (makeTestP)))
+              (is (= (makeTestV) (makeTestV)))
+              (is (not (= (makeTestP) (makeTestV))))
+              (is (not (= (makeTestV) (makeTestP))))
+              (is (not (= (makePoint 4.0 -4.2 3.1) (makeTestP))))
+              (is (not (= (makePoint 4.3 -0.2 3.1) (makeTestP))))
+              (is (not (= (makePoint 4.3 -4.2 0.1) (makeTestP))))
               )
 
-(test/deftest testTupleAdd
-              (test/is (= (tuple/makePoint 1 1 6) (tuple/add (tuple/makePoint 3 -2 5) (tuple/makeVector -2 3 1))))
-              (test/is (= (tuple/makePoint 1 1 6) (tuple/add (tuple/makePoint 3 -2 5) (tuple/makePoint -2 3 1))))
+(deftest testTupleAdd
+              (is (= (makePoint 1 1 6) (add (makePoint 3 -2 5) (makeVector -2 3 1))))
+              (is (= (makePoint 1 1 6) (add (makePoint 3 -2 5) (makePoint -2 3 1))))
               )
