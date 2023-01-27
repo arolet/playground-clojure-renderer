@@ -1,5 +1,4 @@
-(ns renderer.tuple
-    (:require [clojure.test :as test]))
+(ns renderer.tuple)
 
 (defrecord Tuple [x y z w])
 

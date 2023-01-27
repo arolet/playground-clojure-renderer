@@ -1,4 +1,4 @@
-(ns tests.renderer.tuple
+(ns renderer.tuple_test
     (:require [clojure.test :as test]
       [renderer.tuple :as tuple]))
 

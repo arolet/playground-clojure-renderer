@@ -13,3 +13,14 @@ pom.xml.asc
 .nrepl-port
 .cpcache/
 .idea/
+/target
+/classes
+/checkouts
+profiles.clj
+/.lein-*
+/.nrepl-port
+/.prepl-port
+.hgignore
+.hg/
+
+
