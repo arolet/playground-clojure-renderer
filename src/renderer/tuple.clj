@@ -10,16 +10,26 @@
 
 (defn isPoint [tuple] (== (:w tuple) 1.0))
 
+(defn allKeys [a b]
+  (distinct (concat (keys a) (keys b)))
+  )
+
+(defn sameKeys [a b] (= (keys a) (keys b)))
+
 (defn equal [a b]
-  (reduce (fn [ncoll v]
-            (and ncoll (== (v a) (v b))))
-          true
-          [:x :y :z :w]
-          ))
+  (and (sameKeys a b)
+    (reduce (fn [agg v]
+              (and agg (== (v a) (v b))))
+            true
+            (allKeys a b)
+            )
+    ))
 
 (defn add [a b]
   (def merged (merge-with + a b))
-  (assoc merged :w (min 1 (:w merged)))
+  (if (contains? a :w)
+    (assoc merged :w (min 1 (:w merged)))
+    (identity merged))
   )
 
 (defn removeTuple [a b] (merge-with - a b))
@@ -29,7 +39,7 @@
                         (assoc ncoll k (* factor v)))
                       {}
                       a))
-  (assoc merged :w (:w a))
+  (if (contains? a :w) (assoc merged :w (:w a)) (identity merged))
   )
 
 (defn div [a factor]
@@ -39,17 +49,17 @@
   (mul a -1))
 
 (defn dot [a b]
-  (reduce (fn [ncoll v]
-            (+ ncoll (* (v a) (v b))))
+  (reduce (fn [agg v]
+            (+ agg (* (v a) (v b))))
           0
-          [:x :y :z :w]
+          (allKeys a b)
           ))
 
 (defn norm [a]
   (Math/sqrt
-    (reduce (fn [ncoll v]
-              (def val (v a))
-              (+ ncoll (* val val)))
+    (reduce (fn [agg v]
+              (def coord (v a))
+              (+ agg (* coord coord)))
             0
             [:x :y :z]
             )))

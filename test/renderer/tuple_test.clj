@@ -36,6 +36,7 @@
               (is (not (equal (makePoint 4.3 -4.2 0.1) (makeTestP))))
               (is (equal (makePoint 0.0 -4.0 3.1) (makePoint 0 -4 3.1)))
               (is (equal (makePoint 0.0 -4.0 3.1) (makePoint -0.0 -4.0 3.1)))
+              (is (not (equal {:a 1} {:b 0})))
               )
 
 (deftest testTupleAdd
@@ -102,4 +103,18 @@
   (is (equal (makeVector -1 0 0) (normalize (makeVector -36 0 0))))
   (is (equal (makeVector sqrt3Inv sqrt3Inv sqrt3Inv) (normalize (makeVector 1 1 1))))
   (is (equal (makeVector sqrt14_inv (* 2 sqrt14_inv) (* 3 sqrt14_inv)) (normalize (makeVector 1 2 3))))
+  )
+
+(deftest testAllKeys
+  (is (= '() (allKeys {} {})))
+  (is (= '(:a) (allKeys {:a 1} {})))
+  (is (= '(:a) (allKeys {:a 1} {:a 0})))
+  (is (= '(:a :b) (allKeys {:a 1} {:b 0})))
+  )
+
+(deftest testSameKeys
+  (is (sameKeys {} {}))
+  (is (sameKeys {:a 1} {:a 1}))
+  (is (sameKeys {:a 1 :b nil :w 4} {:a 0 :b 2 :w 4}))
+  (is (not (sameKeys {:a 1 :w 4} {:a 0 :b 2 :w 4})))
   )
