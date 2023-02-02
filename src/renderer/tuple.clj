@@ -16,10 +16,12 @@
 
 (defn sameKeys [a b] (= (keys a) (keys b)))
 
+(def EPSILON 1e-6)
+
 (defn equal [a b]
   (and (sameKeys a b)
     (reduce (fn [agg v]
-              (and agg (== (v a) (v b))))
+              (and agg (<= (Math/abs (- (v a) (v b))) EPSILON)))
             true
             (allKeys a b)
             )
