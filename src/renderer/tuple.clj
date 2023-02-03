@@ -13,7 +13,7 @@
 (defn equal [a b]
   (and (= (count a) (count b))
        (reduce (fn [agg v]
-                 (and agg (<= (Math/abs v) EPSILON))
+                 (and agg (<= (abs v) EPSILON))
                  )
                true
                (mapv - a b))
