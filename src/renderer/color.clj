@@ -6,7 +6,7 @@
 (def removeColor Tuple/removeTuple)
 (def equal Tuple/equal)
 
-(defrecord Color [r g b])
+(defn makeColor [r g b] (identity [r g b]))
 
 (defn elemMul [a b]
-  (merge-with * a b))
+  (mapv * a b))
