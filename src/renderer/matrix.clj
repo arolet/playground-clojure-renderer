@@ -6,7 +6,7 @@
 (defn equal1else0 [a b]
   (if (== a b) 1 0))
 
-(defn makeFromFun [height width fun]
+(defn matFromFun [height width fun]
   (let [data (mapv
                (fn [i]
                  (mapv (fn [j] (fun i j)) (range width))
@@ -16,7 +16,7 @@
   )
 
 (defn makeIdentity [size]
-  (makeFromFun size size equal1else0)
+  (matFromFun size size equal1else0)
   )
 
 
@@ -79,4 +79,30 @@
   )
 
 (defn transpose [a]
-  (makeFromFun (:width a) (:height a) (fn [i j] (mGet a j i))))
+  (matFromFun (:width a) (:height a) (fn [i j] (mGet a j i))))
+
+(declare cofactor)
+(defn det [a]
+  (if (not (= (:width a) (:height a)))
+    (throw (AssertionError. "Only 2x2 mat determinant is implemented"))
+    )
+  (if (= (:width a) 2)
+    (- (* (mGet a 0 0) (mGet a 1 1)) (* (mGet a 0 1) (mGet a 1 0)))
+    (dot (getRow a 0) (mapv (fn [i] (cofactor a 0 i)) (range (:width a))))
+    )
+  )
+
+(defn decrementIfLower [i thresh] (if (< i thresh) i (+ i 1)))
+(defn delRowCol [mat delRow delCol]
+  (matFromFun (- (:height mat) 1)
+              (- (:width mat) 1)
+              (fn [i j] (let [newI (decrementIfLower i delRow)
+                              newJ (decrementIfLower j delCol)]
+                          (mGet mat newI newJ)))
+              ))
+
+(defn minor [mat i j] (det (delRowCol mat i j)))
+
+(defn cofactor [mat i j] (let [thisMinor (minor mat i j)]
+                           (if (even? (+ i j))
+                             thisMinor (- thisMinor))))

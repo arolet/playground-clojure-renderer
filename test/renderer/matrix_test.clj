@@ -12,7 +12,7 @@
 (deftest testMakeIdentity
   (is (matEqual (->Mat 2 2 [1 0 0 1]) (makeIdentity 2)))
   (is (matEqual (->Mat 3 3 [1 0 0 0 1 0 0 0 1]) (makeIdentity 3)))
-  (is (matEqual (->Mat 4 4 [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ]) (makeIdentity 4)))
+  (is (matEqual (->Mat 4 4 [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]) (makeIdentity 4)))
   )
 
 (deftest testMakeMatrix
@@ -69,11 +69,11 @@
 (deftest testMatDotWithCopies
   (is (matEqual (->Mat 4 4 [20 22 50 48 44 54 114 108 40 58 110 102 16 26 46 42])
                 (mDotWithCopies (->Mat 4 4 [1 2 3 4 5 6 7 8 9 8 7 6 5 4 3 2])
-                      (->Mat 4 4 [-2 1 2 3 3 2 1 -1 4 3 6 5 1 2 7 8])))
+                                (->Mat 4 4 [-2 1 2 3 3 2 1 -1 4 3 6 5 1 2 7 8])))
       )
   (is (matEqual (->Mat 2 2 [11 13 20 31])
                 (mDotWithCopies (->Mat 2 3 [1 2 3 4 5 6])
-                      (->Mat 3 2 [-2 1 2 3 3 2])))
+                                (->Mat 3 2 [-2 1 2 3 3 2])))
       )
   )
 
@@ -91,16 +91,16 @@
 (deftest testIdentityDot
   (is (let [expected (->Mat 3 3 [1 2 3 4 5 6 7 8 9])
             actual (mDot (makeIdentity 3) expected)]
-        (matEqual expected  actual)))
+        (matEqual expected actual)))
   (is (let [expected (->Mat 3 3 [1 2 3 4 5 6 7 8 9])
             actual (mDot (makeIdentity 3) expected)]
-        (matEqual expected  actual)))
+        (matEqual expected actual)))
   (is (let [expected (->Mat 2 2 [1 2 3 4])
             actual (mDot (makeIdentity 2) expected)]
-        (matEqual expected  actual)))
+        (matEqual expected actual)))
   (is (let [expected (->Mat 4 4 [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16])
             actual (mDot (makeIdentity 4) expected)]
-        (matEqual expected  actual)))
+        (matEqual expected actual)))
   (is (Tuple/equal [3 -2 5] (mDotVecL (makeIdentity 3) [3 -2 5])))
   (is (Tuple/equal [3 -2 5] (mDotVec (makeIdentity 3) [3 -2 5])))
   )
@@ -123,4 +123,49 @@
         (matEqual expected actual)))
   )
 
+(deftest test2x2Determinant
+  (is (== 1 (det (makeIdentity 2))))
+  (is (== 0 (det (->Mat 2 2 [1 1 1 1]))))
+  (is (== 17 (det (->Mat 2 2 [1 5 -3 2]))))
+  )
 
+(deftest testDelRowCol
+  (is (matEqual (->Mat 2 2 [-3 2 0 6]) (delRowCol (->Mat 3 3 [1 5 0 -3 2 7 0 6 -3]) 0 2)))
+  (is (matEqual (->Mat 3 3 [-6 1 6 -8 8 6 -7 -1 1])
+                (delRowCol (->Mat 4 4 [-6 1 1 6 -8 5 8 6 -1 0 8 2 -7 1 -1 1]) 2 1)))
+  )
+
+(deftest testMinor
+  (let [mat (->Mat 3 3 [3 5 0 2 -1 -7 6 -1 5])
+        deleted (delRowCol mat 1 0)]
+    (is (== 25 (det deleted)))
+    (is (== 25 (minor mat 1 0)))
+    )
+  )
+
+(deftest testCofactor
+  (let [mat (->Mat 3 3 [3 5 0 2 -1 -7 6 -1 5])]
+    (is (== -12 (minor mat 0 0)))
+    (is (== -12 (cofactor mat 0 0)))
+    (is (== 25 (minor mat 1 0)))
+    (is (== -25 (cofactor mat 1 0)))
+    )
+  )
+
+(deftest testDetDimOver2
+  (let [mat (->Mat 3 3 [1 2 6 -5 8 -4 2 6 4])]
+    (is (== 56) (cofactor mat 0 0))
+    (is (== 12) (cofactor mat 0 1))
+    (is (== -46) (cofactor mat 0 2))
+    (is (== -196) (det mat))
+    )
+  (let [mat (->Mat 4 4 [-2 -8 3 5 -3 1 7 3 1 2 -9 6 -6 7 7 -9])]
+    (is (== 690) (cofactor mat 0 0))
+    (is (== 447) (cofactor mat 0 1))
+    (is (== 210) (cofactor mat 0 2))
+    (is (== 51) (cofactor mat 0 3))
+    (is (== -4071) (det mat))
+    )
+  (is (== -2120 (det (->Mat 4 4 [6 4 4 4 5 5 7 6 4 -9 3 -7 9 1 7 -6]))))
+  (is (== 0 (det (->Mat 4 4 [1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 0]))))
+  )
