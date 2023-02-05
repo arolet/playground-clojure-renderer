@@ -1,18 +1,18 @@
 (ns renderer.matrix
   (:require [renderer.tuple :refer [equal dot]]))
 
-(defrecord Mat [width height data])
+(defrecord Mat [height width data])
 
 (defn equal1else0 [a b]
   (if (== a b) 1 0))
 
-(defn makeFromFun [width height fun]
+(defn makeFromFun [height width fun]
   (let [data (mapv
                (fn [i]
                  (mapv (fn [j] (fun i j)) (range width))
                  )
                (range height))]
-    (->Mat width height (flatten data)))
+    (->Mat height width (flatten data)))
   )
 
 (defn makeIdentity [size]
@@ -58,11 +58,11 @@
   )
 
 (defn mDotVec [mat v]
-  (:data (mDot mat (->Mat 1 (:width mat) v)))
+  (:data (mDot mat (->Mat (:width mat) 1 v)))
   )
 
 (defn mDotVecL [mat v]
-  (:data (mDot (->Mat (:height mat) 1 v) mat))
+  (:data (mDot (->Mat 1 (:height mat) v) mat))
   )
 
 
@@ -79,4 +79,4 @@
   )
 
 (defn transpose [a]
-  (makeFromFun (:height a) (:width a) (fn [i j] (mGet a j i))))
+  (makeFromFun (:width a) (:height a) (fn [i j] (mGet a j i))))
