@@ -20,19 +20,36 @@
 (defn getCol [a j]
   (mapv (fn [i] (mGet a i j)) (range (:height a))))
 
-(defn mDotVec [mat v]
-  (mapv (fn [i]
-          (dot (getRow mat i) v))
-        (range (:height mat)))
-  )
-
-(defn mDotVecL [mat v]
-  (mapv (fn [j]
-          (dot (getCol mat j) v))
-        (range (:width mat)))
+(defn innerDot [a b i j]
+  (reduce +
+          (mapv (fn [k] (* (mGet a i k) (mGet b k j)))
+                (range (:width a))
+                )
+          )
   )
 
 (defn mDot [a b]
+  (let [width (:width b)
+        height (:height a)
+        data (mapv
+               (fn [i]
+                 (mapv (fn [j] (innerDot a b i j)) (range width))
+                 )
+               (range height))]
+    (->Mat width height (flatten data))
+    )
+  )
+
+(defn mDotVec [mat v]
+  (:data (mDot mat (->Mat 1 (:width mat) v)))
+  )
+
+(defn mDotVecL [mat v]
+  (:data (mDot (->Mat (:height mat) 1 v) mat))
+  )
+
+
+(defn mDotWithCopies [a b]
   (let [width (:width b)
         height (:height a)
         data (mapv

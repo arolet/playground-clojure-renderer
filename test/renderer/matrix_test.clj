@@ -50,12 +50,25 @@
   (is (Tuple/equal [10 28 42 60] (mDotVec testMat1 [1 1 1 1])))
   (is (Tuple/equal [0 0 0 0] (mDotVec testMat1 [1 -1 -1 1])))
   (is (Tuple/equal [2 2 2 2] (mDotVec testMat1 [-1 1 -1 1])))
+  (is (Tuple/equal [-2 -5] (mDotVec (->Mat 3 2 [1 2 3 4 5 6]) [-1 1 -1])))
   )
 
 (deftest testMDotVecL
   (is (Tuple/equal [29 33 37 41] (mDotVecL testMat1 [1 1 1 1])))
   (is (Tuple/equal [0 0 0 0] (mDotVecL testMat1 [1 -1 -1 1])))
   (is (Tuple/equal [9 9 9 9] (mDotVecL testMat1 [-1 1 -1 1])))
+  (is (Tuple/equal [3 3 3] (mDotVecL (->Mat 3 2 [1 2 3 4 5 6]) [-1 1])))
+  )
+
+(deftest testMatDotWithCopies
+  (is (matEqual (->Mat 4 4 [20 22 50 48 44 54 114 108 40 58 110 102 16 26 46 42])
+                (mDotWithCopies (->Mat 4 4 [1 2 3 4 5 6 7 8 9 8 7 6 5 4 3 2])
+                      (->Mat 4 4 [-2 1 2 3 3 2 1 -1 4 3 6 5 1 2 7 8])))
+      )
+  (is (matEqual (->Mat 2 2 [11 13 20 31])
+                (mDotWithCopies (->Mat 3 2 [1 2 3 4 5 6])
+                      (->Mat 2 3 [-2 1 2 3 3 2])))
+      )
   )
 
 (deftest testMatDot
@@ -63,9 +76,9 @@
                 (mDot (->Mat 4 4 [1 2 3 4 5 6 7 8 9 8 7 6 5 4 3 2])
                       (->Mat 4 4 [-2 1 2 3 3 2 1 -1 4 3 6 5 1 2 7 8])))
       )
-
   (is (matEqual (->Mat 2 2 [11 13 20 31])
                 (mDot (->Mat 3 2 [1 2 3 4 5 6])
                       (->Mat 2 3 [-2 1 2 3 3 2])))
       )
   )
+
