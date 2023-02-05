@@ -1,5 +1,5 @@
 (ns renderer.matrix
-  (:require [renderer.tuple :refer [equal dot]]))
+  (:require [renderer.tuple :refer [equal dot EPSILON]]))
 
 (defrecord Mat [height width data])
 
@@ -22,10 +22,11 @@
 
 (defn getMatData [mat] (:data mat))
 
-(defn matEqual [a b]
-  (and (= (:width a) (:width b))
-       (= (:height a) (:height b))
-       (equal (getMatData a) (getMatData b)))
+(defn matEqual
+  ([a b] (matEqual a b EPSILON))
+  ([a b tol] (and (= (:width a) (:width b))
+                  (= (:height a) (:height b))
+                  (equal (getMatData a) (getMatData b) tol)))
   )
 
 (defn mGet [mat i j]
@@ -84,7 +85,7 @@
 (declare cofactor)
 (defn det [a]
   (if (not (= (:width a) (:height a)))
-    (throw (AssertionError. "Only 2x2 mat determinant is implemented"))
+    (throw (AssertionError. "Only square matrix determinant can be computed"))
     )
   (if (= (:width a) 2)
     (- (* (mGet a 0 0) (mGet a 1 1)) (* (mGet a 0 1) (mGet a 1 0)))
@@ -106,3 +107,16 @@
 (defn cofactor [mat i j] (let [thisMinor (minor mat i j)]
                            (if (even? (+ i j))
                              thisMinor (- thisMinor))))
+
+; inverse is very slow for matrix of size higher than 7 or so
+(defn inverse [mat]
+  (let [determinant (double (det mat))
+        size (:width mat)]
+    (if (== determinant 0)
+      (throw (AssertionError. "Matrix is not invertible: det=0")))
+    (matFromFun size size
+                (fn [i j] (/ (cofactor mat j i) determinant))))
+
+  )
+
+

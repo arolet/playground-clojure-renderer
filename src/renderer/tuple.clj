@@ -10,14 +10,15 @@
 
 (def EPSILON 1e-6)
 
-(defn equal [a b]
-  (and (= (count a) (count b))
+(defn equal
+  ([a b] (equal a b EPSILON))
+  ([a b tol] (and (= (count a) (count b))
        (reduce (fn [agg v]
-                 (and agg (<= (abs v) EPSILON))
+                 (and agg (<= (abs v) tol))
                  )
                true
                (mapv - a b))
-       )
+       ))
   )
 
 (defn add [a b] (mapv + a b))
