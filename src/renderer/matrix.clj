@@ -3,6 +3,23 @@
 
 (defrecord Mat [width height data])
 
+(defn equal1else0 [a b]
+  (if (== a b) 1 0))
+
+(defn makeFromFun [width height fun]
+  (let [data (mapv
+               (fn [i]
+                 (mapv (fn [j] (fun i j)) (range width))
+                 )
+               (range height))]
+    (->Mat width height (flatten data)))
+  )
+
+(defn makeIdentity [size]
+  (makeFromFun size size equal1else0)
+  )
+
+
 (defn getMatData [mat] (:data mat))
 
 (defn matEqual [a b]
@@ -60,3 +77,6 @@
     (->Mat width height (flatten data))
     )
   )
+
+(defn transpose [a]
+  (makeFromFun (:height a) (:width a) (fn [i j] (mGet a j i))))

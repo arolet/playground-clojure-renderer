@@ -9,6 +9,12 @@
 (def mat33 (->Mat 3 3 [-3 5 0 1 -2 -7 0 1 1]))
 
 
+(deftest testMakeIdentity
+  (is (matEqual (->Mat 2 2 [1 0 0 1]) (makeIdentity 2)))
+  (is (matEqual (->Mat 3 3 [1 0 0 0 1 0 0 0 1]) (makeIdentity 3)))
+  (is (matEqual (->Mat 4 4 [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ]) (makeIdentity 4)))
+  )
+
 (deftest testMakeMatrix
   (is (matEqual testMat1 testMat1))
   (is (== 1 (mGet testMat1 0 0)))
@@ -81,4 +87,40 @@
                       (->Mat 2 3 [-2 1 2 3 3 2])))
       )
   )
+
+(deftest testIdentityDot
+  (is (let [expected (->Mat 3 3 [1 2 3 4 5 6 7 8 9])
+            actual (mDot (makeIdentity 3) expected)]
+        (matEqual expected  actual)))
+  (is (let [expected (->Mat 3 3 [1 2 3 4 5 6 7 8 9])
+            actual (mDot (makeIdentity 3) expected)]
+        (matEqual expected  actual)))
+  (is (let [expected (->Mat 2 2 [1 2 3 4])
+            actual (mDot (makeIdentity 2) expected)]
+        (matEqual expected  actual)))
+  (is (let [expected (->Mat 4 4 [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16])
+            actual (mDot (makeIdentity 4) expected)]
+        (matEqual expected  actual)))
+  (is (Tuple/equal [3 -2 5] (mDotVecL (makeIdentity 3) [3 -2 5])))
+  (is (Tuple/equal [3 -2 5] (mDotVec (makeIdentity 3) [3 -2 5])))
+  )
+
+(deftest testTranspose
+  (is (matEqual (->Mat 2 2 [1 3 2 4]) (transpose (->Mat 2 2 [1 2 3 4]))))
+  (is (matEqual (->Mat 2 2 [1 3 2 4]) (transpose (->Mat 2 2 [1 2 3 4]))))
+  (is (matEqual (->Mat 3 2 [1 3 5 2 4 6]) (transpose (->Mat 2 3 [1 2 3 4 5 6]))))
+  (is (matEqual (makeIdentity 3) (transpose (makeIdentity 3))))
+  (is (matEqual (->Mat 4 4 [0 9 1 0 9 8 8 0 3 0 5 5 0 8 3 8])
+                (transpose (->Mat 4 4 [0 9 3 0 9 8 0 8 1 8 5 3 0 0 5 8]))))
+  )
+
+(deftest testTransposeSelfInverse
+  (is (let [expected (->Mat 3 3 [1 2 3 4 5 6 7 8 9])
+            actual (transpose (transpose expected))]
+        (matEqual expected actual)))
+  (is (let [expected (->Mat 3 2 [1 3 5 2 4 6])
+            actual (transpose (transpose expected))]
+        (matEqual expected actual)))
+  )
+
 
