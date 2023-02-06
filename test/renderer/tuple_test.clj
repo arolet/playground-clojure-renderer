@@ -125,3 +125,14 @@
   (is (equal (makeVector sqrt3Inv sqrt3Inv sqrt3Inv) (normalize (makeVector 1 1 1))))
   (is (equal (makeVector sqrt14_inv (* 2 sqrt14_inv) (* 3 sqrt14_inv)) (normalize (makeVector 1 2 3))))
   )
+
+(deftest testSameDirection
+  (is (sameDirection? (makeVector 1 0 0) (makeVector 1 0 0)))
+  (is (sameDirection? (makeVector 10 0 0) (makeVector 1 0 0)))
+  (is (sameDirection? (makeVector 1 0.00001 0) (makeVector 1 0 0)))
+  (is (sameDirection? (makeVector 1 -1 1) (makeVector 3 -3 3)))
+  (is (sameDirection? (makeVector 1 -1 1) (makeVector 0 0 0)))
+  (is (not (sameDirection? (makeVector 1 0 0) (makeVector 0 1 0))))
+  (is (not (sameDirection? (makeVector 1 0 0) (makeVector -1 1 0))))
+  (is (not (sameDirection? (makeVector 1 1 0) (makeVector 1 -1 0))))
+  )

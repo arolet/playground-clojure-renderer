@@ -13,12 +13,12 @@
 (defn equal
   ([a b] (equal a b EPSILON))
   ([a b tol] (and (= (count a) (count b))
-       (reduce (fn [agg v]
-                 (and agg (<= (abs v) tol))
-                 )
-               true
-               (mapv - a b))
-       ))
+                  (reduce (fn [agg v]
+                            (and agg (<= (abs v) tol))
+                            )
+                          true
+                          (mapv - a b))
+                  ))
   )
 
 (defn add [a b] (mapv + a b))
@@ -50,7 +50,7 @@
   (Math/sqrt (dot a a)))
 
 (defn pointNorm [a]
-  (norm (subvec  a 0 (- (count a) 1)))
+  (norm (subvec a 0 (- (count a) 1)))
   )
 
 (defn cross [a b]
@@ -62,3 +62,9 @@
 
 (defn normalize [a]
   (div a (norm a)))
+
+(defn sameDirection?
+  ([a b] (sameDirection? a b EPSILON))
+  ([a b tol]
+   (>= (dot a b) (- (* (norm a) (norm b)) tol)))
+  )
