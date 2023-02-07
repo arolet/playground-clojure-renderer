@@ -4,10 +4,28 @@
 
 (defrecord Ray [origin direction norm])
 
-(defrecord Intersection [point time])
+(defrecord Intersection [ray point time object3d])
 
-(defn makeIntersection [{origin :origin direction :direction} t]
-  (->Intersection (Tuple/add origin (Tuple/mul direction t)) t))
+(defn makeIntersection [ray t]
+  (->Intersection ray
+                  (Tuple/add (:origin ray) (Tuple/mul (:direction ray) t))
+                  t
+                  nil)
+  )
+
+(defn hit [intersections]
+  (reduce
+    (fn [red inter]
+      (if (< (:time inter) 0)
+        red
+        (if (or (= nil red) (< (:time inter) (:time red)))
+          inter
+          red)
+        )
+      )
+    nil
+    intersections)
+  )
 
 (defn makeRay [origin direction]
   (->Ray origin direction (Tuple/norm direction))

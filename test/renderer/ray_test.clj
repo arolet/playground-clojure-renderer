@@ -3,10 +3,9 @@
             [renderer.ray :refer :all]
             [renderer.tuple :refer
              [equal isPoint isVector
-              makePoint makeVector norm]]))
+              makePoint makeVector norm]]
+            [renderer.utils :refer [closeTo]]))
 
-(defn closeTo ([a b] (closeTo a b 1e-8))
-  ([a b tol] (< (abs (- a b)) tol)))
 
 (defn assertCorrectRay [ray]
   (is (isPoint (:origin ray)) (format "Origin (%s) is a point" (:origin ray)))
@@ -103,3 +102,14 @@
     )
   )
 
+(deftest testHit
+  (let [i1 (->Intersection nil (makePoint 0 0 0) 1 nil)
+        i2 (->Intersection nil (makePoint 0 0 0) 2 nil)]
+    (is (= i1 (hit [i1 i2]))))
+  (let [i1 (->Intersection nil (makePoint 0 0 0) -1 nil)
+        i2 (->Intersection nil (makePoint 0 0 0) 2 nil)]
+    (is (= i2 (hit [i1 i2]))))
+  (let [i1 (->Intersection nil (makePoint 0 0 0) -1 nil)
+        i2 (->Intersection nil (makePoint 0 0 0) -2 nil)]
+    (is (= nil (hit [i1 i2]))))
+  )

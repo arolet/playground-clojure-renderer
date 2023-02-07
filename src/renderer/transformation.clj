@@ -45,3 +45,5 @@
               0 0 0 1]))
 
 (defn chain [& transforms] (reduce mDot (reverse transforms)))
+
+(defn rotationXYZ [x y z] (chain (rotationX x) (rotationY y) (rotationZ z)))
