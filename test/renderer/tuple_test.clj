@@ -136,3 +136,11 @@
   (is (not (sameDirection? (makeVector 1 0 0) (makeVector -1 1 0))))
   (is (not (sameDirection? (makeVector 1 1 0) (makeVector 1 -1 0))))
   )
+
+(deftest testAverage
+  (is (equal (makePoint 0 0 0) (average (makePoint 0 0 0))))
+  (is (equal (makePoint 0.5 0 0) (average (makePoint 0 0 0) (makePoint 1 0 0))))
+  (is (equal (makePoint 0 0.5 0) (average (makePoint 0 0 0) (makePoint 0 1 0))))
+  (is (equal (makePoint 0.5 0 0.5) (average (makePoint 0 0 0) (makePoint 1 0 1))))
+  (is (equal (makeVector 0 (/ 1.0 3) 0) (average (makeVector 0 0 0) (makeVector 1 1 0) (makeVector -1 0 0))))
+  )

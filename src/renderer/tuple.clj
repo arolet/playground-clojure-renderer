@@ -68,3 +68,12 @@
   ([a b tol]
    (>= (dot a b) (- (* (norm a) (norm b)) tol)))
   )
+
+(defn addAll [& tuples]
+  (reduce add tuples)
+  )
+
+(defn average [& tuples]
+  ; don't use on points
+  (div (apply addAll tuples) (count tuples))
+  )
