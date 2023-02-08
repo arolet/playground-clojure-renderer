@@ -7,15 +7,15 @@
             [renderer.utils :refer [closeTo]]))
 
 (deftest testMakeSphere
-  (is (= "sphere" (:type (makeSphere))))
-  (is (matEqual (makeIdentity 4) (:transformation (makeSphere))))
+  (is (= "sphere" (:type (makeSphere nil))))
+  (is (matEqual (makeIdentity 4) (:transformation (makeSphere nil))))
   )
 
 (deftest testIntersect
   (is (equal (makePoint 1 2 3)
-             (mDotVec (:transformation (makeSphere [1 2 3])) (makePoint 0 0 0))))
+             (mDotVec (:transformation (makeSphere nil [1 2 3])) (makePoint 0 0 0))))
   (let [ray (makeRay (makePoint 0 0 -5) (makeVector 0 0 1))
-        sphere (makeSphere [0 0 0] [0 0 0] [2 2 2])
+        sphere (makeSphere nil [0 0 0] [0 0 0] [2 2 2])
         intersections (intersect ray [sphere])]
     (is (= 2 (count intersections)))
     (is (closeTo (:time (nth intersections 0)) 3))
@@ -26,7 +26,7 @@
     (is (objEqual (:ray (nth intersections 1)) ray))
     )
   (let [ray (makeRay (makePoint 0 0 -5) (makeVector 0 0 1))
-        sphere (makeSphere [5 0 0])
+        sphere (makeSphere nil [5 0 0])
         intersections (intersect ray [sphere])]
     (is (= 0 (count intersections)))
     )

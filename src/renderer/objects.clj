@@ -4,22 +4,25 @@
             [renderer.transformation :refer
              [chain rotationXYZ scaling sheering translation]]))
 
-(defrecord Object3d [type intersect transformation inverted])
+(defrecord Object3d [type intersect transformation inverted material])
 
 (defn transformRay [mat {origin :origin direction :direction}]
   (Ray/makeRay (mDotVec mat origin) (mDotVec mat direction)))
 
 (defrecord ObjIntersection [ray object3d point time])
 
+(defn addObjectToHits [hits obj]
+  (mapv (fn [inter] (assoc inter :object3d obj)) hits)
+  )
+
 (defn intersect [ray objects]
-  (flatten
-    (mapv
-      (fn [obj]
-        (mapv
-          (fn [inter] (assoc inter :object3d obj))
-          ((:intersect obj) (transformRay (:inverted obj) ray))))
-      objects)
-    )
+  (mapcat
+    (fn [obj]
+      (let [hits ((:intersect obj) (transformRay (:inverted obj) ray))]
+        (addObjectToHits hits obj)
+        )
+      )
+    objects)
   )
 
 (defn objEqual [a b]
@@ -28,15 +31,15 @@
   )
 
 (defn makeSphere
-  ([] (makeSphere [0 0 0]))
-  ([position] (makeSphere position [0 0 0]))
-  ([position rotate] (makeSphere position rotate [1 1 1]))
-  ([position rotate scale] (makeSphere position rotate scale [0 0 0 0 0 0]))
-  ([position rotate scale sheer]
+  ([config] (makeSphere config [0 0 0]))
+  ([config position] (makeSphere config position [0 0 0]))
+  ([config position rotate] (makeSphere config position rotate [1 1 1]))
+  ([config position rotate scale] (makeSphere config position rotate scale [0 0 0 0 0 0]))
+  ([config position rotate scale sheer]
    (let [transformation (chain (apply sheering sheer)
                                (apply scaling scale)
                                (apply rotationXYZ rotate)
                                (apply translation position))]
-     (->Object3d "sphere" Ray/intersectUnitSphere transformation (inverse transformation)))
+     (->Object3d "sphere" Ray/intersectUnitSphere transformation (inverse transformation) config))
    )
   )
