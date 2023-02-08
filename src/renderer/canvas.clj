@@ -37,11 +37,23 @@
 
 (defn fnToCanvas [func width height]
   (let [data (mapv
-              (fn [i]
-                (mapv (fn [j] (func i j)) (range width))
-                )
-              (range height))]
+               (fn [row]
+                 (mapv (fn [col] (func row col)) (range width))
+                 )
+               (range height))]
     (->Canvas data width height)
+    )
+  )
+
+(defn applyFunAntialiasing [func row col]
+  (apply Tuple/average
+         (mapv (fn [[rowOff colOff]] (func (+ row rowOff) (+ col colOff)))
+               [[-0.25 -0.25] [0.25 -0.25] [-0.25 0.25] [0.25 0.25]])))
+
+(defn fnToCanvasAntiAliased [func width height]
+  (let [antiAliasFun
+        (fn [row col] (applyFunAntialiasing func row col))]
+    (fnToCanvas antiAliasFun width height)
     )
   )
 
@@ -57,7 +69,7 @@
     line
     (let [index (Strings/last-index-of line " " maxChars)]
       [(subs line 0 index) (splitLine (subs line (+ 1 index)) maxChars)]
-     )
+      )
     )
   )
 
