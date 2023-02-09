@@ -14,15 +14,16 @@
 
 (defrecord ObjIntersection [ray object3d point time])
 
-(defn addObjectToHits [hits obj]
-  (mapv (fn [inter] (assoc inter :object3d obj)) hits)
+(defn addObjectToHits [hits obj ray]
+  (mapv (fn [inter] (Ray/makeIntersection ray (:time inter) obj))
+        hits)
   )
 
 (defn intersect [ray objects]
   (mapcat
     (fn [obj]
       (let [hits ((:intersect obj) (transformRay (:inverted obj) ray))]
-        (addObjectToHits hits obj)
+        (addObjectToHits hits obj ray)
         )
       )
     objects)

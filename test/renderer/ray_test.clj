@@ -59,38 +59,38 @@
 
 (deftest testIntersectUnitSphere
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint -2 0 0) (makeVector 1 0 0)))]
-    (is (equal (makePoint -1 0 0) (:point enter)))
-    (is (equal (makePoint 1 0 0) (:point leave)))
+    (is (equal (makePoint -1 0 0) (getPoint enter)))
+    (is (equal (makePoint 1 0 0) (getPoint leave)))
     (is (closeTo 1 (:time enter)))
     (is (closeTo 3 (:time leave)))
     )
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint -2 -1 0) (makeVector 1 1 0)))]
-    (is (equal (makePoint -1 0 0) (:point enter)))
-    (is (equal (makePoint 0 1 0) (:point leave)))
+    (is (equal (makePoint -1 0 0) (getPoint enter)))
+    (is (equal (makePoint 0 1 0) (getPoint leave)))
     (is (closeTo 1 (:time enter)))
     (is (closeTo 2 (:time leave)))
     )
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint 0 -2 0.5) (makeVector 0 1 0)))]
-    (is (equal (makePoint 0 (- sqrt3_2) 0.5) (:point enter)))
-    (is (equal (makePoint 0 sqrt3_2 0.5) (:point leave)))
+    (is (equal (makePoint 0 (- sqrt3_2) 0.5) (getPoint enter)))
+    (is (equal (makePoint 0 sqrt3_2 0.5) (getPoint leave)))
     (is (closeTo (- 2 sqrt3_2) (:time enter)))
     (is (closeTo (+ 2 sqrt3_2) (:time leave)))
     )
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint 1 -3 0) (makeVector 0 1 0)))]
-    (is (equal (makePoint 1 0 0) (:point enter)))
-    (is (equal (makePoint 1 0 0) (:point leave)))
+    (is (equal (makePoint 1 0 0) (getPoint enter)))
+    (is (equal (makePoint 1 0 0) (getPoint leave)))
     (is (closeTo 3 (:time enter)))
     (is (closeTo 3 (:time leave)))
     )
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint (- (Math/sqrt 2)) 0 0) (makeVector 1 0 1)))]
-    (is (equal (makePoint (- sqrt2_2) 0 sqrt2_2) (:point enter)))
-    (is (equal (makePoint (- sqrt2_2) 0 sqrt2_2) (:point leave)))
+    (is (equal (makePoint (- sqrt2_2) 0 sqrt2_2) (getPoint enter)))
+    (is (equal (makePoint (- sqrt2_2) 0 sqrt2_2) (getPoint leave)))
     (is (closeTo sqrt2_2 (:time enter)))
     (is (closeTo sqrt2_2 (:time leave)))
     )
   (let [[enter leave] (intersectUnitSphere (makeRay (makePoint (- (Math/sqrt 2)) 0 (- (Math/sqrt 2))) (makeVector 1 0 1)))]
-    (is (equal (makePoint (- sqrt2_2) 0 (- sqrt2_2)) (:point enter)))
-    (is (equal (makePoint sqrt2_2 0 sqrt2_2) (:point leave)))
+    (is (equal (makePoint (- sqrt2_2) 0 (- sqrt2_2)) (getPoint enter)))
+    (is (equal (makePoint sqrt2_2 0 sqrt2_2) (getPoint leave)))
     (is (closeTo sqrt2_2 (:time enter)))
     (is (closeTo (* 3 sqrt2_2) (:time leave)))
     )
@@ -103,13 +103,13 @@
   )
 
 (deftest testHit
-  (let [i1 (->Intersection nil (makePoint 0 0 0) 1 nil)
-        i2 (->Intersection nil (makePoint 0 0 0) 2 nil)]
+  (let [i1 (->Intersection nil 1 nil)
+        i2 (->Intersection nil 2 nil)]
     (is (= i1 (hit [i1 i2]))))
-  (let [i1 (->Intersection nil (makePoint 0 0 0) -1 nil)
-        i2 (->Intersection nil (makePoint 0 0 0) 2 nil)]
+  (let [i1 (->Intersection nil -1 nil)
+        i2 (->Intersection nil 2 nil)]
     (is (= i2 (hit [i1 i2]))))
-  (let [i1 (->Intersection nil (makePoint 0 0 0) -1 nil)
-        i2 (->Intersection nil (makePoint 0 0 0) -2 nil)]
+  (let [i1 (->Intersection nil -1 nil)
+        i2 (->Intersection nil -2 nil)]
     (is (= nil (hit [i1 i2]))))
   )
