@@ -144,3 +144,9 @@
   (is (equal (makePoint 0.5 0 0.5) (average (makePoint 0 0 0) (makePoint 1 0 1))))
   (is (equal (makeVector 0 (/ 1.0 3) 0) (average (makeVector 0 0 0) (makeVector 1 1 0) (makeVector -1 0 0))))
   )
+
+(def sqrt2_2 (/ 1 (Math/sqrt 2)))
+(deftest testReflect
+  (is (equal (makeVector 1 1 0) (reflect (makeVector 1 -1 0) (makeVector 0 1 0))))
+  (is (equal (makeVector 1 0 0) (reflect (makeVector 0 -1 0) (makeVector sqrt2_2 sqrt2_2 0))))
+  )

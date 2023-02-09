@@ -77,3 +77,11 @@
   ; don't use on points
   (div (apply addAll tuples) (count tuples))
   )
+
+(defn reflect [in reference]
+  (add in (mul reference (* -2 (dot in reference))))
+  )
+
+(defn castToVector [pt]
+  (makeVector (nth pt 0) (nth pt 1) (nth pt 2))
+  )
