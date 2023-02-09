@@ -1,6 +1,7 @@
 (ns renderer.screen_test
   (:require [clojure.test :refer :all]
             [renderer.screen :refer :all]
+            [renderer.tuple :as Tuple]
             [renderer.utils :refer :all]
             [renderer.tuple :refer [equal makePoint makeVector]]))
 
@@ -31,5 +32,16 @@
     (is (equal (makePoint 1 0.99 -0.99) (getPixelPoint screen 0 0)))
     (is (equal (makePoint 1 -0.01 0.01) (getPixelPoint screen 50 50)))
     (is (equal (makePoint 1 -0.99 0.99) (getPixelPoint screen 99 99)))
+    )
+  )
+
+
+(deftest testGetPixelRay
+  (let [screen (makeScreen 100 100 (makePoint 1 1 -1) (makePoint 1 1 1)
+                           (makePoint 1 -1 -1))
+        camera (->Camera (makePoint 0 0 0) screen)]
+    (is (equal (Tuple/normalize (makeVector 1 0.99 -0.99)) (:direction (getPixelRay camera 0 0))))
+    (is (equal (Tuple/normalize (makeVector 1 -0.01 0.01)) (:direction (getPixelRay camera 50 50))))
+    (is (equal (Tuple/normalize (makeVector 1 -0.99 0.99)) (:direction (getPixelRay camera 99 99))))
     )
   )
