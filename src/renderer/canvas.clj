@@ -1,8 +1,8 @@
 (ns renderer.canvas
-  (:require [renderer.color :as Color]
-            [renderer.tuple :as Tuple]
+  (:require [clojure.math :refer [round]]
             [clojure.string :as Strings]
-            [clojure.math :refer [round]]))
+            [renderer.color :as Color]
+            [renderer.tuple :as Tuple]))
 
 (defrecord Canvas [data width height])
 
@@ -54,7 +54,7 @@
 (defn fnToCanvasRow [pixelFun row width postFunc]
   (let [data (mapv (fn [col] (pixelFun row col)) (range width))]
     (postFunc data)
-    data)
+    )
   )
 
 (defn applyFunAntialiasing [func row col]
@@ -65,9 +65,9 @@
 (defn fnToCanvasAntiAliased
   ([func width height] (fnToCanvasAntiAliased func width height nil))
   ([func width height fName] (let [antiAliasFun
-        (fn [row col] (applyFunAntialiasing func row col))]
-    (fnToCanvas antiAliasFun width height fName)
-    ))
+                                   (fn [row col] (applyFunAntialiasing func row col))]
+                               (fnToCanvas antiAliasFun width height fName)
+                               ))
   )
 
 (defn getSingleDataRow [row]
@@ -130,9 +130,9 @@
 
 (defn getRowSaveFunc [fName]
   (if (= fName nil)
-    (fn [_row])
+    identity
     (fn [row]
-    (spit fName (str (Strings/join "\n" (toPpmLine (getSingleDataRow row) 70)) "\n") :append true)
+      (spit fName (str (Strings/join "\n" (toPpmLine (getSingleDataRow row) 70)) "\n") :append true)
+      )
     )
-  )
   )
