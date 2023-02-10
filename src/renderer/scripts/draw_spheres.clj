@@ -59,11 +59,12 @@
                                            (makePoint 1 1 1)
                                            (makePoint 1 -1 -1)))
 
-(defn drawSpheres [eye width height objects light]
+(defn drawSpheres [eye width height objects light fName]
   (let [camera (makeCamera eye (getScreen width height))]
     (toCanvas (getDrawingFunction camera objects light)
               width
-              height)
+              height
+              fName)
     )
   )
 
@@ -77,6 +78,5 @@
 
 (def myLight (Light/pointLight (makePoint -1 -1.3 -0.8)))
 
-(def sphereCanvas (drawSpheres eye 500 500 spheres myLight))
+(def sphereCanvas (drawSpheres eye 1000 1000 spheres myLight "sphere.ppm"))
 
-(Canvas/saveAsPpm "sphere.ppm" sphereCanvas)

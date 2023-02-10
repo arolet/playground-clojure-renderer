@@ -35,14 +35,26 @@
        )
   )
 
-(defn fnToCanvas [func width height]
-  (let [data (mapv
-               (fn [row]
-                 (mapv (fn [col] (func row col)) (range width))
-                 )
-               (range height))]
-    (->Canvas data width height)
-    )
+(declare fnToCanvasRow initPpm getRowSaveFunc)
+
+(defn fnToCanvas
+  ([func width height] (fnToCanvas func width height nil))
+  ([func width height fName]
+   (initPpm fName width height)
+   (let [saveFunc (getRowSaveFunc fName)
+         data (mapv
+                (fn [row]
+                  (fnToCanvasRow func row width saveFunc)
+                  )
+                (range height))]
+     (->Canvas data width height)
+     ))
+  )
+
+(defn fnToCanvasRow [pixelFun row width postFunc]
+  (let [data (mapv (fn [col] (pixelFun row col)) (range width))]
+    (postFunc data)
+    data)
   )
 
 (defn applyFunAntialiasing [func row col]
@@ -50,25 +62,30 @@
          (mapv (fn [[rowOff colOff]] (func (+ row rowOff) (+ col colOff)))
                [[-0.25 -0.25] [0.25 -0.25] [-0.25 0.25] [0.25 0.25]])))
 
-(defn fnToCanvasAntiAliased [func width height]
-  (let [antiAliasFun
+(defn fnToCanvasAntiAliased
+  ([func width height] (fnToCanvasAntiAliased func width height nil))
+  ([func width height fName] (let [antiAliasFun
         (fn [row col] (applyFunAntialiasing func row col))]
-    (fnToCanvas antiAliasFun width height)
+    (fnToCanvas antiAliasFun width height fName)
+    ))
+  )
+
+(defn getSingleDataRow [row]
+  (let [flat (flatten row)
+        intRow (floatToInt flat)]
+    (mapv (fn [val] (str val)) intRow)
     )
   )
 
-
 (defn getDataRows [canvas]
-  (let [lines (mapv flatten (:data canvas))
-        linesInt (mapv floatToInt lines)]
-    (mapv (fn [row] (mapv (fn [val] (str val)) row)) linesInt))
+  (mapv getSingleDataRow (:data canvas))
   )
 
 (defn addValToPpmLine [{lines :lines current :current} val maxChars]
   (if (>= (+ (count current) (count val)) maxChars)
-    {:lines (conj lines (Strings/triml current))
+    {:lines   (conj lines (Strings/triml current))
      :current val}
-    {:lines lines
+    {:lines   lines
      :current (str current
                    (if (= current nil) "" " ")
                    val)}
@@ -93,11 +110,29 @@
   (mapcat (fn [row] (toPpmLine row maxChars)) rows))
 
 
+(defn getPpmHeader [width height]
+  (format "P3\n%d %d\n255\n" width height)
+  )
+
 (defn toPpmString [canvas]
-  (str (format "P3\n%d %d\n255\n" (:width canvas) (:height canvas))
+  (str (getPpmHeader (:width canvas) (:height canvas))
        (Strings/join "\n" (toPpmLines (getDataRows canvas) 70))
        "\n"
        ))
 
-(defn saveAsPpm [fname canvas]
-  (spit fname (toPpmString canvas)))
+(defn saveAsPpm [fName canvas]
+  (spit fName (toPpmString canvas)))
+
+(defn initPpm [fName width height]
+  (if (not (= fName nil))
+    (spit fName (getPpmHeader width height)))
+  )
+
+(defn getRowSaveFunc [fName]
+  (if (= fName nil)
+    (fn [_row])
+    (fn [row]
+    (spit fName (str (Strings/join "\n" (toPpmLine (getSingleDataRow row) 70)) "\n") :append true)
+    )
+  )
+  )
