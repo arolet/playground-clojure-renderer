@@ -57,29 +57,45 @@
     )
   )
 
-(defn getDataLines [canvas]
+
+(defn getDataRows [canvas]
   (let [lines (mapv flatten (:data canvas))
         linesInt (mapv floatToInt lines)]
-    (mapv (fn [seq] (Strings/join " " seq)) linesInt))
+    (mapv (fn [row] (mapv (fn [val] (str val)) row)) linesInt))
   )
 
+(defn addValToPpmLine [{lines :lines current :current} val maxChars]
+  (if (>= (+ (count current) (count val)) maxChars)
+    {:lines (conj lines (Strings/triml current))
+     :current val}
+    {:lines lines
+     :current (str current
+                   (if (= current nil) "" " ")
+                   val)}
+    )
+  )
 
-(defn splitLine [line maxChars]
-  (if (<= (count line) maxChars)
-    line
-    (let [index (Strings/last-index-of line " " maxChars)]
-      [(subs line 0 index) (splitLine (subs line (+ 1 index)) maxChars)]
+(defn toPpmLine [row maxChars]
+  (let [joined (reduce (fn [agg val] (addValToPpmLine agg val maxChars))
+                       {:lines [] :current nil}
+                       row)
+        {last :current lines :lines} joined
+        ]
+    (if (= (count last) 0)
+      lines
+      (conj lines last)
       )
     )
   )
 
-(defn splitLines [lines maxChars]
-  (flatten (mapv (fn [v] (splitLine v maxChars)) lines)))
+
+(defn toPpmLines [rows maxChars]
+  (mapcat (fn [row] (toPpmLine row maxChars)) rows))
 
 
 (defn toPpmString [canvas]
   (str (format "P3\n%d %d\n255\n" (:width canvas) (:height canvas))
-       (Strings/join "\n" (splitLines (getDataLines canvas) 70))
+       (Strings/join "\n" (toPpmLines (getDataRows canvas) 70))
        "\n"
        ))
 

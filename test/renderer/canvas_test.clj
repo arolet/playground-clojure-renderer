@@ -45,9 +45,14 @@
   )
 
 (deftest testSplitLine
-  (is (= ["a v" "as d"] (splitLine "a v as d" 4)))
-  (is (= ["a v" "asd d"] (splitLine "a v asd d" 5)))
-  (is (= ["a v" "asd d"] (splitLine "a v asd d" 6)))
+  (is (= ["a v" "as d"] (toPpmLine (Strings/split "a v as d" #" ") 4)))
+  (is (= ["a v" "asd d"] (toPpmLine (Strings/split "a v asd d" #" ") 5)))
+  (is (= ["a v" "asd d"] (toPpmLine (Strings/split "a v asd d" #" ") 6)))
+  (is (= ["a v" "as d" "54 5" "2 56"] (toPpmLine (Strings/split "a v as d 54 5 2 56" #" ") 4)))
+  )
+
+(deftest testSplitHeapError
+  (is (> (count (toPpmLine (repeat 9000 "100") 7)) 10) "Run on a big line to try to raise errors")
   )
 
 (deftest testCanvasToPpmSplitsLines
