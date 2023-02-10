@@ -1,17 +1,14 @@
 (ns renderer.scripts.draw_spheres
-  (:require [clojure.test :refer :all]
-            [renderer.objects :as Objects]
-            [renderer.canvas :as Canvas]
+  (:require [renderer.canvas :as Canvas]
             [renderer.color :as Color]
-            [renderer.ray :as Ray]
-            [renderer.tuple :as Tuple]
-            [renderer.tuple :refer [makePoint minus castToVector]]
-            [renderer.screen :refer [makeScreen getPixelRay makeCamera]]
+            [renderer.light :as Light]
             [renderer.material :refer [material]]
-            [renderer.light :as Light]))
-
-
-
+            [renderer.objects :as Objects]
+            [renderer.ray :as Ray]
+            [renderer.screen :refer [getPixelRay makeCamera makeScreen]]
+            [renderer.tuple]
+            [renderer.tuple :refer [makePoint minus]]
+            [renderer.utils :refer [combineFileNames]]))
 
 (def background (Color/makeColor 0.01 0.05 0.1))
 (def redMaterial (material (Color/makeColor 0.9 0.3 0.05)))
@@ -19,7 +16,7 @@
 (def yellowMaterial (material (Color/makeColor 1 1 0.8)))
 
 
-(def antialiasing true)
+(def antialiasing false)
 
 
 (defn computePixelHit [camera objects col row]
@@ -78,5 +75,7 @@
 
 (def myLight (Light/pointLight (makePoint -1 -1.3 -0.8)))
 
-(def sphereCanvas (drawSpheres eye 1000 1000 spheres myLight "sphere.ppm"))
+(def fName (combineFileNames "output" "sphere.ppm"))
+
+(def sphereCanvas (drawSpheres eye 100 100 spheres myLight fName))
 
