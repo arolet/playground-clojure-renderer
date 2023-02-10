@@ -4,11 +4,11 @@
             [renderer.light :as Light]
             [renderer.material :refer [material]]
             [renderer.objects :as Objects]
-            [renderer.ray :as Ray]
             [renderer.screen :refer [getPixelRay makeCamera makeScreen]]
             [renderer.tuple]
-            [renderer.tuple :refer [makePoint minus]]
-            [renderer.utils :refer [combineFileNames]]))
+            [renderer.tuple :refer [makePoint]]
+            [renderer.utils :refer [combineFileNames]]
+            [renderer.world :as World]))
 
 (def background (Color/makeColor 0.01 0.05 0.1))
 (def redMaterial (material (Color/makeColor 0.9 0.3 0.05)))
@@ -18,31 +18,10 @@
 
 (def antialiasing false)
 
-
-(defn computePixelHit [camera objects col row]
-  (let [ray (getPixelRay camera col row)
-        intersections (Objects/intersect ray objects)]
-    (Ray/hit intersections))
-  )
-
-(defn computeColor [hit light]
-  (let [point (Ray/getPoint hit)
-        obj (:object3d hit)]
-    (Light/phongLighting light
-                         (:material obj)
-                         point
-                         (minus (:direction (:ray hit)))
-                         (Objects/normalAt obj point)
-                         ))
-  )
-
-(defn getDrawingFunction [camera objects light]
+(defn getDrawingFunction [camera world]
   (fn [row col]
-    (let [hit (computePixelHit camera objects col row)]
-      (if (= hit nil)
-        background
-        (computeColor hit light)
-        )
+    (let [ray (getPixelRay camera col row)]
+      (World/colorAt world ray)
       )
     )
   )
@@ -56,9 +35,9 @@
                                            (makePoint 1 1 1)
                                            (makePoint 1 -1 -1)))
 
-(defn drawSpheres [eye width height objects light fName]
+(defn drawWorld [eye width height world fName]
   (let [camera (makeCamera eye (getScreen width height))]
-    (toCanvas (getDrawingFunction camera objects light)
+    (toCanvas (getDrawingFunction camera world)
               width
               height
               fName)
@@ -75,7 +54,9 @@
 
 (def myLight (Light/pointLight (makePoint -1 -1.3 -0.8)))
 
+(def world (World/world spheres myLight background))
+
 (def fName (combineFileNames "output" "sphere.ppm"))
 
-(def sphereCanvas (drawSpheres eye 100 100 spheres myLight fName))
+(def sphereCanvas (drawWorld eye 250 250 world fName))
 

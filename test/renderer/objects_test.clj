@@ -3,7 +3,7 @@
             [renderer.matrix :refer [mDotVec makeIdentity matEqual]]
             [renderer.transformation :refer [chain rotationZ scaling]]
             [renderer.objects :refer :all]
-            [renderer.ray :refer [makeRay]]
+            [renderer.ray :refer [makeRay makeIntersection]]
             [renderer.tuple :refer [equal makePoint makeVector]]
             [renderer.utils :refer [closeTo]]
             [renderer.material :refer
@@ -57,5 +57,38 @@
   (let [mater (material)
         sphere (makeSphere mater)]
     (is (= mater (:material sphere)))
+    )
+  )
+
+(deftest testComputeIntersectionState
+  (let [ray (makeRay (makePoint 0 0 -5) (makeVector 0 0 1))
+        sphere (makeSphere)
+        intersection (makeIntersection ray 4 sphere)
+        state (computeIntersectionState intersection)]
+    (is (= 4 (:time state)))
+    (is (= sphere (:object3d state)))
+    (is (equal (makePoint 0 0 -1) (:point state)))
+    (is (equal (makeVector 0 0 -1) (:eyeV state)))
+    (is (equal (makeVector 0 0 -1) (:normal state)))
+    )
+  )
+
+(deftest testComputeIntersectionStateInsideOutside
+  (let [ray (makeRay (makePoint 0 0 -5) (makeVector 0 0 1))
+        sphere (makeSphere)
+        intersection (makeIntersection ray 4 sphere)
+        state (computeIntersectionState intersection)]
+    (is (not (:inside state)))
+    )
+  (let [ray (makeRay (makePoint 0 0 0) (makeVector 0 0 1))
+        sphere (makeSphere)
+        intersection (makeIntersection ray 1 sphere)
+        state (computeIntersectionState intersection)]
+    (is (:inside state))
+    (is (= 1 (:time state)))
+    (is (= sphere (:object3d state)))
+    (is (equal (makePoint 0 0 1) (:point state)))
+    (is (equal (makeVector 0 0 -1) (:eyeV state)))
+    (is (equal (makeVector 0 0 -1) (:normal state)))
     )
   )

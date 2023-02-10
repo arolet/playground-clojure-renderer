@@ -12,7 +12,7 @@
 (defn transformRay [mat {origin :origin direction :direction}]
   (Ray/makeRay (mDotVec mat origin) (mDotVec mat direction)))
 
-(defrecord ObjIntersection [ray object3d point time])
+(defrecord IntersectionState [time object3d point eyeV normal inside])
 
 (defn addObjectToHits [hits obj ray]
   (mapv (fn [inter] (Ray/makeIntersection ray (:time inter) obj))
@@ -72,4 +72,19 @@
         normalOnWorld (mDotVec (:invertedTranspose obj) normalOnUnit)
         normalOnWorldFixed (Tuple/castToVector normalOnWorld)]
     (Tuple/normalize normalOnWorldFixed))
+  )
+
+(defn computeIntersectionState [intersection]
+  (let [obj (:object3d intersection)
+        point (Ray/getPoint intersection)
+        eyeV (Tuple/minus (:direction (:ray intersection)))
+        normal (normalAt obj point)
+        inside (< (Tuple/dot eyeV normal) 0)]
+    (->IntersectionState (:time intersection)
+                         obj
+                         point
+                         eyeV
+                         (if inside (Tuple/minus normal) normal)
+                         inside)
+    )
   )
