@@ -4,17 +4,27 @@
 
 (defrecord Ray [origin direction norm])
 
+(defn make-ray
+  ([origin direction] (make-ray origin direction false))
+  ([origin direction normalize]
+   (if normalize
+     (->Ray origin (Tuple/normalize direction) 1.0)
+     (->Ray origin direction (Tuple/norm direction))
+     )
+   )
+  )
+
 (defrecord Intersection [ray time object3d])
 
-(defn makeIntersection
-  ([ray t] (makeIntersection ray t nil))
+(defn make-intersection
+  ([ray t] (make-intersection ray t nil))
   ([ray t obj]
    (->Intersection ray
                    t
                    obj))
   )
 
-(defn getPoint [{ray :ray t :time}]
+(defn get-point [{ray :ray t :time}]
   (Tuple/add (:origin ray) (Tuple/mul (:direction ray) t)))
 
 (defn hit [intersections]
@@ -31,34 +41,11 @@
     intersections)
   )
 
-(defn makeRay
-  ([origin direction] (makeRay origin direction false))
-  ([origin direction normalize]
-   (if normalize
-     (->Ray origin (Tuple/normalize direction) 1.0)
-     (->Ray origin direction (Tuple/norm direction))
-     )
-   )
-  )
-
-(defn projectPoint [{origin :origin direction :direction norm :norm} point]
-  (let [originToPoint (Tuple/removeTuple point origin)
+(defn project-point [{origin :origin direction :direction norm :norm} point]
+  (let [originToPoint (Tuple/remove-tuple point origin)
         t (/ (Tuple/dot originToPoint direction) (* norm norm))
         projected (Tuple/add origin (Tuple/mul direction t))
-        dist (Tuple/norm (Tuple/removeTuple point projected))]
+        dist (Tuple/norm (Tuple/remove-tuple point projected))]
     [projected dist t]
-    )
-  )
-
-(defn intersectUnitSphere [ray]
-  (let [[_projected dist t] (projectPoint ray (Tuple/makePoint 0 0 0))]
-    (if (or (> dist 1) (< t 0))
-      []
-      (let [distToIntersection (/ (Math/sqrt (- 1 (* dist dist))) (:norm ray))
-            enterT (- t distToIntersection)
-            leaveT (+ t distToIntersection)]
-        [(makeIntersection ray enterT)
-         (makeIntersection ray leaveT)])
-      )
     )
   )

@@ -6,82 +6,82 @@
 
 (defrecord Canvas [data width height])
 
-(defn colorCanvas [color width height]
+(defn color-canvas [color width height]
   (->Canvas
     (vec (repeat height
                  (vec (repeat width color))))
     width
     height)
   )
-(defn blankCanvas [width height]
-  (colorCanvas (Color/makeColor 0 0 0)
-               width
-               height)
+(defn blank-canvas [width height]
+  (color-canvas (Color/make-color 0 0 0)
+                width
+                height)
   )
 
-(defn dataEqual [a b]
-  (Tuple/equal (flatten a) (flatten b)))
+(defn data-equal [a b]
+  (Tuple/equal? (flatten a) (flatten b)))
 
 (defn clip [a]
   (min 1 (max 0 a)))
 
-(defn floatToInt [a]
+(defn floats->ints [a]
   (mapv (fn [v] (round (* (clip v) 255))) a))
 
 (defn equal [a b]
   (and (= (:width a) (:width b))
        (= (:height a) (:height b))
-       (dataEqual (:data a) (:data b))
+       (data-equal (:data a) (:data b))
        )
   )
 
-(declare fnToCanvasRow initPpm getRowSaveFunc)
+(declare fn->canvas-row init-ppm get-row-save-fun)
 
-(defn fnToCanvas
-  ([func width height] (fnToCanvas func width height nil))
+(defn fn->canvas
+  ([func width height] (fn->canvas func width height nil))
   ([func width height fName]
-   (initPpm fName width height)
-   (let [saveFunc (getRowSaveFunc fName)
+   (init-ppm fName width height)
+   (let [saveFunc (get-row-save-fun fName)
          data (mapv
                 (fn [row]
-                  (fnToCanvasRow func row width saveFunc)
+                  (fn->canvas-row func row width saveFunc)
                   )
                 (range height))]
      (->Canvas data width height)
      ))
   )
 
-(defn fnToCanvasRow [pixelFun row width postFunc]
+(defn fn->canvas-row [pixelFun row width postFunc]
   (let [data (mapv (fn [col] (pixelFun row col)) (range width))]
     (postFunc data)
     )
   )
 
-(defn applyFunAntialiasing [func row col]
+(defn compose-antialiasing [func row col]
   (apply Tuple/average
          (mapv (fn [[rowOff colOff]] (func (+ row rowOff) (+ col colOff)))
                [[-0.25 -0.25] [0.25 -0.25] [-0.25 0.25] [0.25 0.25]])))
 
-(defn fnToCanvasAntiAliased
-  ([func width height] (fnToCanvasAntiAliased func width height nil))
+(defn fn->canvas-antialias
+  ([func width height] (fn->canvas-antialias func width height nil))
   ([func width height fName] (let [antiAliasFun
-                                   (fn [row col] (applyFunAntialiasing func row col))]
-                               (fnToCanvas antiAliasFun width height fName)
+                                   (fn [row col] (compose-antialiasing func row col))]
+                               (fn->canvas antiAliasFun width height fName)
                                ))
   )
 
-(defn getSingleDataRow [row]
+(defn get-data-row [row]
   (let [flat (flatten row)
-        intRow (floatToInt flat)]
+        intRow (floats->ints flat)]
     (mapv (fn [val] (str val)) intRow)
     )
   )
 
-(defn getDataRows [canvas]
-  (mapv getSingleDataRow (:data canvas))
+(defn get-all-data-rows [canvas]
+  (mapv get-data-row (:data canvas))
   )
 
-(defn addValToPpmLine [{lines :lines current :current} val maxChars]
+(defn add-val-to-ppm-line [{lines :lines current :current} val maxChars]
   (if (>= (+ (count current) (count val)) maxChars)
     {:lines   (conj lines (Strings/triml current))
      :current val}
@@ -92,8 +92,8 @@
     )
   )
 
-(defn toPpmLine [row maxChars]
-  (let [joined (reduce (fn [agg val] (addValToPpmLine agg val maxChars))
+(defn row->ppm-line [row maxChars]
+  (let [joined (reduce (fn [agg val] (add-val-to-ppm-line agg val maxChars))
                        {:lines [] :current nil}
                        row)
         {last :current lines :lines} joined
@@ -106,33 +106,33 @@
   )
 
 
-(defn toPpmLines [rows maxChars]
-  (mapcat (fn [row] (toPpmLine row maxChars)) rows))
+(defn rows->ppm-lines [rows maxChars]
+  (mapcat (fn [row] (row->ppm-line row maxChars)) rows))
 
 
-(defn getPpmHeader [width height]
+(defn get-ppm->header [width height]
   (format "P3\n%d %d\n255\n" width height)
   )
 
-(defn toPpmString [canvas]
-  (str (getPpmHeader (:width canvas) (:height canvas))
-       (Strings/join "\n" (toPpmLines (getDataRows canvas) 70))
+(defn canvas->ppm [canvas]
+  (str (get-ppm->header (:width canvas) (:height canvas))
+       (Strings/join "\n" (rows->ppm-lines (get-all-data-rows canvas) 70))
        "\n"
        ))
 
-(defn saveAsPpm [fName canvas]
-  (spit fName (toPpmString canvas)))
+(defn save-as-ppm [fName canvas]
+  (spit fName (canvas->ppm canvas)))
 
-(defn initPpm [fName width height]
+(defn init-ppm [fName width height]
   (if (not (= fName nil))
-    (spit fName (getPpmHeader width height)))
+    (spit fName (get-ppm->header width height)))
   )
 
-(defn getRowSaveFunc [fName]
+(defn get-row-save-fun [fName]
   (if (= fName nil)
     identity
     (fn [row]
-      (spit fName (str (Strings/join "\n" (toPpmLine (getSingleDataRow row) 70)) "\n") :append true)
+      (spit fName (str (Strings/join "\n" (row->ppm-line (get-data-row row) 70)) "\n") :append true)
       )
     )
   )

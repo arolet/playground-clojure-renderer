@@ -6,37 +6,37 @@
 
 (defrecord World [objects light background])
 
-(def defaultBackground (Color/makeColor 0.05 0.1 0.05))
+(def default-background (Color/make-color 0.05 0.1 0.05))
 
-(defn world ([] (world [] nil))
-  ([objects light] (world objects light defaultBackground))
+(defn make-world ([] (make-world [] nil))
+  ([objects light] (make-world objects light default-background))
   ([objects light background] (->World objects light background))
   )
 
-(defn addObject [w object]
-  (assoc w :objects (conj (:objects w) object))
+(defn add-object [world object]
+  (assoc world :objects (conj (:objects world) object))
   )
 
-(defn intersect [w ray]
-  (sort-by :time (Objects/intersect ray (:objects w)))
+(defn intersect [world ray]
+  (sort-by :time (Objects/intersect ray (:objects world)))
   )
 
-(defn shadeHit [{light :light} {obj :object3d point :point eyeV :eyeV normal :normal}]
-  (Light/phongLighting light
-                       (:material obj)
-                       point
-                       eyeV
-                       normal
-                       )
+(defn shade-hit [{light :light} {obj :object3d point :point eyeV :eyeV normal :normal}]
+  (Light/phong-lighting light
+                        (:material obj)
+                        point
+                        eyeV
+                        normal
+                        )
   )
 
-(defn colorAt [w ray]
-  (let [hits (intersect w ray)
+(defn color-at [world ray]
+  (let [hits (intersect world ray)
         hit (Ray/hit hits)]
     (if (= nil hit)
-      (:background w)
-      (shadeHit w
-                (Objects/computeIntersectionState hit))
+      (:background world)
+      (shade-hit world
+                 (Objects/compute-intersection-state hit))
       )
     )
   )

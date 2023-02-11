@@ -1,12 +1,12 @@
 (ns renderer.matrix
-  (:require [renderer.tuple :refer [equal dot EPSILON]]))
+  (:require [renderer.tuple :refer [equal? dot EPSILON]]))
 
 (defrecord Mat [height width data])
 
-(defn equal1else0 [a b]
+(defn equal-1-else-0 [a b]
   (if (== a b) 1 0))
 
-(defn matFromFun [height width fun]
+(defn make-mat-with-fun [height width fun]
   (let [data (mapv
                (fn [i]
                  (mapv (fn [j] (fun i j)) (range width))
@@ -15,64 +15,64 @@
     (->Mat height width (flatten data)))
   )
 
-(defn makeIdentity [size]
-  (matFromFun size size equal1else0)
+(defn make-identity [size]
+  (make-mat-with-fun size size equal-1-else-0)
   )
 
 
-(defn getMatData [mat] (:data mat))
+(defn get-data [mat] (:data mat))
 
-(defn matEqual
-  ([a b] (matEqual a b EPSILON))
+(defn mat-equal?
+  ([a b] (mat-equal? a b EPSILON))
   ([a b tol] (and (= (:width a) (:width b))
                   (= (:height a) (:height b))
-                  (equal (getMatData a) (getMatData b) tol)))
+                  (equal? (get-data a) (get-data b) tol)))
   )
 
-(defn mGet [mat i j]
+(defn m-get [mat i j]
   (nth (:data mat) (+ j (* i (:width mat)))))
 
-(defn getRow [a i]
-  (mapv (fn [j] (mGet a i j)) (range (:width a))))
+(defn get-row [a i]
+  (mapv (fn [j] (m-get a i j)) (range (:width a))))
 
-(defn getCol [a j]
-  (mapv (fn [i] (mGet a i j)) (range (:height a))))
+(defn get-col [a j]
+  (mapv (fn [i] (m-get a i j)) (range (:height a))))
 
-(defn innerDot [a b i j]
+(defn inner-dot [a b i j]
   (reduce +
-          (mapv (fn [k] (* (mGet a i k) (mGet b k j)))
+          (mapv (fn [k] (* (m-get a i k) (m-get b k j)))
                 (range (:width a))
                 )
           )
   )
 
-(defn mDot [a b]
+(defn m-dot [a b]
   (let [width (:width b)
         height (:height a)
         data (mapv
                (fn [i]
-                 (mapv (fn [j] (innerDot a b i j)) (range width))
+                 (mapv (fn [j] (inner-dot a b i j)) (range width))
                  )
                (range height))]
     (->Mat width height (flatten data))
     )
   )
 
-(defn mDotVec [mat v]
-  (:data (mDot mat (->Mat (:width mat) 1 v)))
+(defn m-dot-vec [mat v]
+  (:data (m-dot mat (->Mat (:width mat) 1 v)))
   )
 
-(defn mDotVecL [mat v]
-  (:data (mDot (->Mat 1 (:height mat) v) mat))
+(defn m-dot-vec-l [mat v]
+  (:data (m-dot (->Mat 1 (:height mat) v) mat))
   )
 
 
-(defn mDotWithCopies [a b]
+(defn m-dot-with-copies [a b]
   (let [width (:width b)
         height (:height a)
         data (mapv
                (fn [i]
-                 (mDotVecL b (getRow a i))
+                 (m-dot-vec-l b (get-row a i))
                  )
                (range height))]
     (->Mat width height (flatten data))
@@ -80,7 +80,7 @@
   )
 
 (defn transpose [a]
-  (matFromFun (:width a) (:height a) (fn [i j] (mGet a j i))))
+  (make-mat-with-fun (:width a) (:height a) (fn [i j] (m-get a j i))))
 
 (declare cofactor)
 (defn det [a]
@@ -88,34 +88,35 @@
     (throw (AssertionError. "Only square matrix determinant can be computed"))
     )
   (if (= (:width a) 2)
-    (- (* (mGet a 0 0) (mGet a 1 1)) (* (mGet a 0 1) (mGet a 1 0)))
-    (dot (getRow a 0) (mapv (fn [i] (cofactor a 0 i)) (range (:width a))))
+    (- (* (m-get a 0 0) (m-get a 1 1)) (* (m-get a 0 1) (m-get a 1 0)))
+    (dot (get-row a 0) (mapv (fn [i] (cofactor a 0 i)) (range (:width a))))
     )
   )
 
-(defn decrementIfLower [i thresh] (if (< i thresh) i (+ i 1)))
-(defn delRowCol [mat delRow delCol]
-  (matFromFun (- (:height mat) 1)
-              (- (:width mat) 1)
-              (fn [i j] (let [newI (decrementIfLower i delRow)
-                              newJ (decrementIfLower j delCol)]
-                          (mGet mat newI newJ)))
-              ))
+(defn increment-if-lower [i thresh] (if (< i thresh) i (+ i 1)))
 
-(defn minor [mat i j] (det (delRowCol mat i j)))
+(defn del-row-col [mat delRow delCol]
+  (make-mat-with-fun (- (:height mat) 1)
+                     (- (:width mat) 1)
+                     (fn [i j] (let [newI (increment-if-lower i delRow)
+                              newJ (increment-if-lower j delCol)]
+                                 (m-get mat newI newJ)))
+                     ))
+
+(defn minor [mat i j] (det (del-row-col mat i j)))
 
 (defn cofactor [mat i j] (let [thisMinor (minor mat i j)]
                            (if (even? (+ i j))
                              thisMinor (- thisMinor))))
 
-; inverse is very slow for matrix of size higher than 7 or so
-(defn inverse [mat]
+; invert is very slow for matrix of size higher than 7 or so
+(defn invert [mat]
   (let [determinant (double (det mat))
         size (:width mat)]
     (if (== determinant 0)
       (throw (AssertionError. "Matrix is not invertible: det=0")))
-    (matFromFun size size
-                (fn [i j] (/ (cofactor mat j i) determinant))))
+    (make-mat-with-fun size size
+                       (fn [i j] (/ (cofactor mat j i) determinant))))
 
   )
 

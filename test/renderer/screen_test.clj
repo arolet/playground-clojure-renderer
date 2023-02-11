@@ -3,45 +3,45 @@
             [renderer.screen :refer :all]
             [renderer.tuple :as Tuple]
             [renderer.utils :refer :all]
-            [renderer.tuple :refer [equal makePoint makeVector]]))
+            [renderer.tuple :refer [equal? make-point make-vector]]))
 
-(deftest testMakeScreen
-  (let [screen (makeScreen 100 100 (makePoint 1 1 -1) (makePoint 1 1 1)
-                           (makePoint 1 -1 -1))]
-    (is (equal (makePoint 1 1 -1) (:origin screen)))
-    (is (equal (makeVector 0 0 0.02) (:vX screen)))
-    (is (equal (makeVector 0 -0.02 0) (:vY screen)))
+(deftest test-make-screen
+  (let [screen (make-screen 100 100 (make-point 1 1 -1) (make-point 1 1 1)
+                            (make-point 1 -1 -1))]
+    (is (equal? (make-point 1 1 -1) (:origin screen)))
+    (is (equal? (make-vector 0 0 0.02) (:vX screen)))
+    (is (equal? (make-vector 0 -0.02 0) (:vY screen)))
     )
-  (let [screen (makeScreen 50 100 (makePoint 1 1 -1) (makePoint 1 1 1)
-                           (makePoint 1 -1 -1))]
-    (is (equal (makePoint 1 1 -1) (:origin screen)))
-    (is (equal (makeVector 0 0 0.04) (:vX screen)))
-    (is (equal (makeVector 0 -0.02 0) (:vY screen)))
+  (let [screen (make-screen 50 100 (make-point 1 1 -1) (make-point 1 1 1)
+                            (make-point 1 -1 -1))]
+    (is (equal? (make-point 1 1 -1) (:origin screen)))
+    (is (equal? (make-vector 0 0 0.04) (:vX screen)))
+    (is (equal? (make-vector 0 -0.02 0) (:vY screen)))
     )
-  (let [screen (makeScreen 100 25 (makePoint 1 1 -1) (makePoint 1 1 1)
-                           (makePoint 1 -1 -1))]
-    (is (equal (makePoint 1 1 -1) (:origin screen)))
-    (is (equal (makeVector 0 0 0.02) (:vX screen)))
-    (is (equal (makeVector 0 -0.08 0) (:vY screen)))
-    )
-  )
-
-(deftest testGetPixelPoint
-  (let [screen (makeScreen 100 100 (makePoint 1 1 -1) (makePoint 1 1 1)
-                           (makePoint 1 -1 -1))]
-    (is (equal (makePoint 1 0.99 -0.99) (getPixelPoint screen 0 0)))
-    (is (equal (makePoint 1 -0.01 0.01) (getPixelPoint screen 50 50)))
-    (is (equal (makePoint 1 -0.99 0.99) (getPixelPoint screen 99 99)))
+  (let [screen (make-screen 100 25 (make-point 1 1 -1) (make-point 1 1 1)
+                            (make-point 1 -1 -1))]
+    (is (equal? (make-point 1 1 -1) (:origin screen)))
+    (is (equal? (make-vector 0 0 0.02) (:vX screen)))
+    (is (equal? (make-vector 0 -0.08 0) (:vY screen)))
     )
   )
 
+(deftest test-get-pixel-point
+  (let [screen (make-screen 100 100 (make-point 1 1 -1) (make-point 1 1 1)
+                            (make-point 1 -1 -1))]
+    (is (equal? (make-point 1 0.99 -0.99) (get-pixel-point screen 0 0)))
+    (is (equal? (make-point 1 -0.01 0.01) (get-pixel-point screen 50 50)))
+    (is (equal? (make-point 1 -0.99 0.99) (get-pixel-point screen 99 99)))
+    )
+  )
 
-(deftest testGetPixelRay
-  (let [screen (makeScreen 100 100 (makePoint 1 1 -1) (makePoint 1 1 1)
-                           (makePoint 1 -1 -1))
-        camera (->Camera (makePoint 0 0 0) screen)]
-    (is (equal (Tuple/normalize (makeVector 1 0.99 -0.99)) (:direction (getPixelRay camera 0 0))))
-    (is (equal (Tuple/normalize (makeVector 1 -0.01 0.01)) (:direction (getPixelRay camera 50 50))))
-    (is (equal (Tuple/normalize (makeVector 1 -0.99 0.99)) (:direction (getPixelRay camera 99 99))))
+
+(deftest test-get-pixel-ray
+  (let [screen (make-screen 100 100 (make-point 1 1 -1) (make-point 1 1 1)
+                            (make-point 1 -1 -1))
+        camera (->Camera (make-point 0 0 0) screen)]
+    (is (equal? (Tuple/normalize (make-vector 1 0.99 -0.99)) (:direction (get-pixel-ray camera 0 0))))
+    (is (equal? (Tuple/normalize (make-vector 1 -0.01 0.01)) (:direction (get-pixel-ray camera 50 50))))
+    (is (equal? (Tuple/normalize (make-vector 1 -0.99 0.99)) (:direction (get-pixel-ray camera 99 99))))
     )
   )
