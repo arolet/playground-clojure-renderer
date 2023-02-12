@@ -1,6 +1,8 @@
 (ns renderer.screen
   (:require [renderer.tuple :as Tuple]
-            [renderer.ray :as Ray]))
+            [renderer.ray :as Ray]
+            [renderer.matrix :as Mat]
+            [renderer.transformation :refer [chain translation]]))
 
 (defrecord Screen [origin vX vY])
 
@@ -24,3 +26,21 @@
   (Ray/make-ray (:eye camera)
                 (Tuple/cast-to-vector (get-pixel-point (:screen camera) col row))
                 true))
+
+(defn view-transform [from to up]
+  (let [forward (Tuple/normalize (Tuple/remove-tuple to from))
+        up-n (Tuple/normalize up)
+        left (Tuple/cross forward up-n)
+        true-up (Tuple/cross left forward)
+        orientation (Mat/->Mat 4
+                               4
+                               [(nth left 0) (nth left 1) (nth left 2) 0
+                                (nth true-up 0) (nth true-up 1) (nth true-up 2) 0
+                                (- (nth forward 0)) (- (nth forward 1)) (- (nth forward 2)) 0
+                                0 0 0 1])]
+    (chain (translation (- (nth from 0))
+                        (- (nth from 1))
+                        (- (nth from 2)))
+           orientation)
+    )
+  )
