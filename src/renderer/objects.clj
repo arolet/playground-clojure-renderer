@@ -1,16 +1,13 @@
 (ns renderer.objects
-  (:require [renderer.matrix :refer [invert m-dot-vec mat-equal? transpose]]
+  (:require [renderer.material :refer
+             [make-material]]
+            [renderer.matrix :refer [invert m-dot-vec mat-equal? transpose]]
             [renderer.ray :as Ray]
-            [renderer.tuple :as Tuple]
             [renderer.transformation :refer
              [chain rotation-xyz scaling sheering translation]]
-            [renderer.material :refer
-             [make-material]]))
+            [renderer.tuple :as Tuple]))
 
 (defrecord Object3d [type intersect normalAt transformation inverted invertedTranspose material])
-
-(defn transform-ray [mat {origin :origin direction :direction}]
-  (Ray/make-ray (m-dot-vec mat origin) (m-dot-vec mat direction)))
 
 (defrecord IntersectionState [time object3d point eyeV normal inside])
 
@@ -22,7 +19,7 @@
 (defn intersect [ray objects]
   (mapcat
     (fn [obj]
-      (let [hits ((:intersect obj) (transform-ray (:inverted obj) ray))]
+      (let [hits ((:intersect obj) (Ray/transform-ray (:inverted obj) ray))]
         (add-object-to-hits hits obj ray)
         )
       )

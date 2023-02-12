@@ -1,5 +1,6 @@
 (ns renderer.ray
-  (:require [renderer.tuple :as Tuple]))
+  (:require [renderer.matrix :refer [m-dot-vec]]
+            [renderer.tuple :as Tuple]))
 
 
 (defrecord Ray [origin direction norm])
@@ -13,6 +14,11 @@
      )
    )
   )
+
+(defn transform-ray
+  ([mat ray] (transform-ray mat ray false))
+  ([mat {origin :origin direction :direction} normalize]
+   (make-ray (m-dot-vec mat origin) (m-dot-vec mat direction) normalize)))
 
 (defrecord Intersection [ray time object3d])
 

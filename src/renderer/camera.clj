@@ -1,31 +1,35 @@
 (ns renderer.camera
-  (:require [renderer.tuple :as Tuple]
-            [renderer.ray :as Ray]
+  (:require [renderer.canvas :as Canvas]
             [renderer.matrix :as Mat]
-            [renderer.transformation :refer [chain translation]]))
+            [renderer.ray :as Ray]
+            [renderer.transformation :refer [chain translation]]
+            [renderer.tuple :as Tuple]
+            [renderer.world :refer [color-at]]))
 
-(defrecord Screen [origin vX vY])
+(defrecord Camera
+  [h-size v-size fov transform transform-inverse aspect px-size half-width half-height])
 
-(defrecord Camera [eye screen])
+(defn get-camera-view-params [h-size v-size fov]
+  (let [aspect (/ h-size v-size)
+        half-view-length (Math/tan (/ fov 2))]
+    (if (> aspect 1)
+      [aspect half-view-length (/ half-view-length aspect)]
+      [aspect (* half-view-length aspect) half-view-length])))
 
-(defn make-camera [eye screen] (->Camera eye screen))
+(defn make-camera
+  ([h-size v-size fov] (make-camera h-size v-size fov (Mat/make-identity 4)))
+  ([h-size v-size fov transform]
+   (let [[aspect half-view-width half-view-height] (get-camera-view-params h-size v-size fov)]
+     (->Camera h-size
+               v-size
+               fov
+               transform
+               (Mat/invert transform)
+               aspect
+               (* 2 (/ half-view-width h-size))
+               half-view-width
+               half-view-height))))
 
-(defn make-screen [pxWidth pxHeight topLeft topRight bottomLeft]
-  (let [eX (Tuple/div (Tuple/remove-tuple topRight topLeft) pxWidth)
-        eY (Tuple/div (Tuple/remove-tuple bottomLeft topLeft) pxHeight)]
-    (->Screen topLeft eX eY))
-  )
-
-(defn get-pixel-point [{origin :origin vX :vX vY :vY} col row]
-  (Tuple/add-all origin
-                 (Tuple/mul vX (+ col 0.5))
-                 (Tuple/mul vY (+ row 0.5)))
-  )
-
-(defn get-pixel-ray [camera col row]
-  (Ray/make-ray (:eye camera)
-                (Tuple/cast-to-vector (get-pixel-point (:screen camera) col row))
-                true))
 
 (defn view-transform [from to up]
   (let [forward (Tuple/normalize (Tuple/remove-tuple to from))
@@ -41,6 +45,36 @@
     (chain (translation (- (nth from 0))
                         (- (nth from 1))
                         (- (nth from 2)))
-           orientation)
-    )
-  )
+           orientation)))
+
+(defn ray-for-pixel [cam col row]
+  (let [origin (Tuple/make-point 0 0 0)
+        h-offset (- (:half-width cam) (* (+ 0.5 col) (:px-size cam)))
+        v-offset (- (:half-height cam) (* (+ 0.5 row) (:px-size cam)))
+        px-point (Tuple/make-point h-offset v-offset -1)
+        local-ray (Ray/make-ray origin (Tuple/remove-tuple px-point origin))]
+    (Ray/transform-ray (:transform-inverse cam)
+                       local-ray
+                       true)))
+
+(defn pixel-at [world cam col row]
+  (let [ray (ray-for-pixel cam col row)]
+    (color-at world ray)))
+
+(defn get-drawing-fun [world cam]
+  (fn [row col] (pixel-at world cam col row)))
+
+(defn render
+  ([world cam] (render world cam nil))
+  ([world cam fName] (render world cam fName false))
+  ([world cam fName antialias]
+   (let [canvas (if antialias
+                  (Canvas/fn->canvas-antialias (get-drawing-fun world cam)
+                                               (:h-size cam)
+                                               (:v-size cam)
+                                               fName)
+                  (Canvas/fn->canvas (get-drawing-fun world cam)
+                                     (:h-size cam)
+                                     (:v-size cam)
+                                     fName))]
+     (if (nil? fName) canvas nil))))
