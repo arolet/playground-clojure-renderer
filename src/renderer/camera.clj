@@ -1,4 +1,4 @@
-(ns renderer.screen
+(ns renderer.camera
   (:require [renderer.tuple :as Tuple]
             [renderer.ray :as Ray]
             [renderer.matrix :as Mat]

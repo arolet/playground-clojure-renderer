@@ -4,7 +4,7 @@
             [renderer.light :as Light]
             [renderer.material :refer [make-material]]
             [renderer.objects :as Objects]
-            [renderer.screen :refer [get-pixel-ray make-camera make-screen]]
+            [renderer.camera :refer [get-pixel-ray make-camera make-screen]]
             [renderer.tuple]
             [renderer.tuple :refer [make-point]]
             [renderer.utils :refer [combine-file-names]]

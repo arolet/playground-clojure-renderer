@@ -1,6 +1,6 @@
-(ns renderer.screen_test
+(ns renderer.camera_test
   (:require [clojure.test :refer :all]
-            [renderer.screen :refer :all]
+            [renderer.camera :refer :all]
             [renderer.tuple :as Tuple]
             [renderer.utils :refer :all]
             [renderer.tuple :refer [equal? make-point make-vector]]
