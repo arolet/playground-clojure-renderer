@@ -9,8 +9,6 @@
 
 (defrecord Object3d [type intersect normalAt transformation inverted invertedTranspose material])
 
-(defrecord IntersectionState [time object3d point eyeV normal inside])
-
 (defn add-object-to-hits [hits obj ray]
   (mapv (fn [inter] (Ray/make-intersection ray (:time inter) obj))
         hits)
@@ -83,19 +81,4 @@
         normalOnWorld (m-dot-vec (:invertedTranspose obj) normalOnUnit)
         normalOnWorldFixed (Tuple/cast-to-vector normalOnWorld)]
     (Tuple/normalize normalOnWorldFixed))
-  )
-
-(defn compute-intersection-state [intersection]
-  (let [obj (:object3d intersection)
-        point (Ray/get-point intersection)
-        eyeV (Tuple/minus (:direction (:ray intersection)))
-        normal (normal-at obj point)
-        inside (< (Tuple/dot eyeV normal) 0)]
-    (->IntersectionState (:time intersection)
-                         obj
-                         point
-                         eyeV
-                         (if inside (Tuple/minus normal) normal)
-                         inside)
-    )
   )

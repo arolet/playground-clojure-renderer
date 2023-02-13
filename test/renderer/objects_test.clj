@@ -60,38 +60,6 @@
     )
   )
 
-(deftest test-compute-intersection-state
-  (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
-        sphere (make-sphere)
-        intersection (make-intersection ray 4 sphere)
-        state (compute-intersection-state intersection)]
-    (is (= 4 (:time state)))
-    (is (= sphere (:object3d state)))
-    (is (equal? (make-point 0 0 -1) (:point state)))
-    (is (equal? (make-vector 0 0 -1) (:eyeV state)))
-    (is (equal? (make-vector 0 0 -1) (:normal state)))
-    )
-  )
-
-(deftest test-compute-intersection-state-inside-outside
-  (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
-        sphere (make-sphere)
-        intersection (make-intersection ray 4 sphere)
-        state (compute-intersection-state intersection)]
-    (is (not (:inside state)))
-    )
-  (let [ray (make-ray (make-point 0 0 0) (make-vector 0 0 1))
-        sphere (make-sphere)
-        intersection (make-intersection ray 1 sphere)
-        state (compute-intersection-state intersection)]
-    (is (:inside state))
-    (is (= 1 (:time state)))
-    (is (= sphere (:object3d state)))
-    (is (equal? (make-point 0 0 1) (:point state)))
-    (is (equal? (make-vector 0 0 -1) (:eyeV state)))
-    (is (equal? (make-vector 0 0 -1) (:normal state)))
-    )
-  )
 
 
 (def sqrt3_2 (/ (Math/sqrt 3) 2))
