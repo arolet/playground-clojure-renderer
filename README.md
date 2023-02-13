@@ -7,3 +7,9 @@ I'm learning clojure and 3d rendering in this TDD project, following
 ```sh
 lein test
 ```
+
+# running scripts
+
+```sh
+lein exec -p src/renderer/scripts/draw_chap_7.clj
+```
