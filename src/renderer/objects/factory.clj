@@ -2,17 +2,21 @@
   (:require [renderer.material :refer [make-material]]
             [renderer.objects.objects :refer [->Object3d make-object-config]]
             [renderer.objects.sphere :as Sphere]
+            [renderer.objects.plane :as Plane]
             [renderer.transformation :refer
              [chain rotation-xyz scaling sheering translation]]))
 
 (def sphere-kw Sphere/sphere-kw)
+(def plane-kw Plane/plane-kw)
 
 (defn make-object-from-transform
   ([type transform] (make-object-from-transform type transform (make-material)))
   ([type transform material]
-   (let [[intersect normal-at] (if (= type sphere-kw)
-                       (Sphere/get-sphere-intersect-normal-at)
-                       (throw (AssertionError. (format "Unknown object type %s" type))))]
+   (let [[intersect normal-at]
+         (condp = type
+           sphere-kw (Sphere/get-sphere-intersect-normal-at)
+           plane-kw (Plane/get-plane-intersect-normal-at)
+           (throw (AssertionError. (format "Unknown object type %s" type))))]
      (->Object3d (make-object-config sphere-kw transform material)
                  intersect
                  normal-at))))
@@ -25,7 +29,7 @@
   ([type material position rotate scale] (make-object type material position rotate scale [0 0 0 0 0 0]))
   ([type material position rotate scale sheer]
    (let [transform (chain (apply sheering sheer)
-                               (apply scaling scale)
-                               (apply rotation-xyz rotate)
-                               (apply translation position))]
+                          (apply scaling scale)
+                          (apply rotation-xyz rotate)
+                          (apply translation position))]
      (make-object-from-transform type transform material))))

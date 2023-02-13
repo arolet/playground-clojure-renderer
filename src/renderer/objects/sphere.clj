@@ -3,7 +3,6 @@
             [renderer.tuple :as Tuple]))
 
 (def sphere-kw :sphere)
-(declare intersect-unit-sphere)
 (def normal-at-unit-sphere Tuple/cast-to-vector)
 
 (defn intersect-unit-sphere [ray]
