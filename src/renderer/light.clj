@@ -1,6 +1,6 @@
 (ns renderer.light
   (:require [renderer.color :refer [make-color elem-mul]]
-            [renderer.objects :refer [intersect normal-at]]
+            [renderer.objects.objects :refer [intersect normal-at]]
             [renderer.ray :refer [make-ray hit get-point]]
             [renderer.tuple :refer [add mul normalize remove-tuple dot add-all minus reflect norm]]))
 

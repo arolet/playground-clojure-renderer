@@ -1,5 +1,5 @@
 (ns renderer.world
-  (:require [renderer.objects :as Objects]
+  (:require [renderer.objects.objects :as Objects]
             [renderer.light :as Light]
             [renderer.ray :as Ray]
             [renderer.color :as Color]))
@@ -20,12 +20,11 @@
 
 (defn shade-hit [{light :light} {obj :object3d point :point eyeV :eyeV normal :normal in-shadow? :in-shadow?}]
   (Light/phong-lighting light
-                        (:material obj)
+                        (Objects/get-material obj)
                         point
                         eyeV
                         normal
-                        in-shadow?
-                        ))
+                        in-shadow?))
 
 (defn color-at [world ray]
   (let [hits (intersect world ray)

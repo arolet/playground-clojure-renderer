@@ -5,7 +5,7 @@
             [renderer.light :refer [make-point-light compute-intersection-state]]
             [renderer.tuple :refer [make-point make-vector equal?]]
             [renderer.color :refer [make-color]]
-            [renderer.objects :refer [make-sphere]]
+            [renderer.objects.factory :refer [make-object]]
             [renderer.material :refer [make-material]]))
 
 (deftest test-empty-world
@@ -13,13 +13,13 @@
   (is (= nil (:light (make-world)))))
 
 (deftest test-add-object
-  (is (some #(= (make-sphere) %) (:objects (add-object (make-world) (make-sphere)))))
-  (is (some #(= (make-sphere {:a 1}) %) (:objects (add-object (add-object (make-world) (make-sphere)) (make-sphere {:a 1}))))))
+  (is (some #(= (make-object :sphere) %) (:objects (add-object (make-world) (make-object :sphere)))))
+  (is (some #(= (make-object :sphere {:a 1}) %) (:objects (add-object (add-object (make-world) (make-object :sphere)) (make-object :sphere {:a 1}))))))
 
 (defn default-world
   ([] (default-world (make-point-light (make-point -10 10 -10))))
-  ([light] (make-world [(make-sphere (make-material (make-color 0.8 1 0.6) 0.1 0.7 0.2))
-                   (make-sphere (make-material) [0 0 0] [0 0 0] [0.5 0.5 0.5])]
+  ([light] (make-world [(make-object :sphere (make-material (make-color 0.8 1 0.6) 0.1 0.7 0.2))
+                   (make-object :sphere (make-material) [0 0 0] [0 0 0] [0.5 0.5 0.5])]
                        light)))
 
 (deftest test-intersect-world
@@ -45,8 +45,8 @@
     (is (equal? (make-color 0.90498 0.90498 0.90498) (shade-hit world state) 1e-5))))
 
 (deftest test-shade-hit-in-shadow
-  (let [s1 (make-sphere (make-material))
-        s2 (make-sphere (make-material) [0 0 10])
+  (let [s1 (make-object :sphere (make-material))
+        s2 (make-object :sphere (make-material) [0 0 10])
         world (make-world [s1 s2] (make-point-light (make-point 0 0 -10)))
         ray (make-ray (make-point 0 0 5) (make-vector 0 0 1))
         hit (make-intersection ray 4 s2)

@@ -3,7 +3,7 @@
             [renderer.color :as Color]
             [renderer.light :as Light]
             [renderer.material :refer [make-material]]
-            [renderer.objects :as Objects]
+            [renderer.objects.factory :refer [make-object sphere-kw]]
             [renderer.tuple]
             [renderer.tuple :refer [make-point make-vector]]
             [renderer.utils :refer [combine-file-names]]
@@ -15,12 +15,12 @@
 (def green2-material (make-material (Color/make-color 0.1 1 0.5) 0.1 0.7 0.3))
 (def yellow-material (make-material (Color/make-color 1 0.8 0.1)))
 
-(def spheres [(Objects/make-sphere floor-material [0 0 0] [0 0 0] [10 0.01 10])
-              (Objects/make-sphere floor-material [0 0 5] [(/ Math/PI 2) (/ Math/PI -4) 0] [10 0.01 10])
-              (Objects/make-sphere floor-material [0 0 5] [(/ Math/PI 2) (/ Math/PI 4) 0] [10 0.01 10])
-              (Objects/make-sphere green-material [-0.5 1 0.1])
-              (Objects/make-sphere green2-material [1.5 0.5 -0.5] [0 0 0] [0.5 0.5 0.5])
-              (Objects/make-sphere yellow-material [-1.5 0.33 -0.75] [0 0 0] [0.33 0.33 0.33])])
+(def spheres [(make-object sphere-kw floor-material [0 0 0] [0 0 0] [10 0.01 10])
+              (make-object sphere-kw floor-material [0 0 5] [(/ Math/PI 2) (/ Math/PI -4) 0] [10 0.01 10])
+              (make-object sphere-kw floor-material [0 0 5] [(/ Math/PI 2) (/ Math/PI 4) 0] [10 0.01 10])
+              (make-object sphere-kw green-material [-0.5 1 0.1])
+              (make-object sphere-kw green2-material [1.5 0.5 -0.5] [0 0 0] [0.5 0.5 0.5])
+              (make-object sphere-kw yellow-material [-1.5 0.33 -0.75] [0 0 0] [0.33 0.33 0.33])])
 
 (def light (Light/make-point-light (make-point -10 10 -10)))
 

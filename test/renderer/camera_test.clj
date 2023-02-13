@@ -5,7 +5,7 @@
             [renderer.light :as Light]
             [renderer.material :as Material]
             [renderer.matrix :refer [->Mat make-identity mat-equal?]]
-            [renderer.objects :as Objects]
+            [renderer.objects.factory :refer [make-object]]
             [renderer.transformation :refer [chain rotation-y scaling translation]]
             [renderer.tuple :refer [equal? make-point make-vector]]
             [renderer.utils :refer :all]
@@ -86,11 +86,11 @@
     (is (equal? (Color/make-color 0.38066 0.47583 0.2855) (nth (nth (:data canvas) 5) 5) 1e-5))))
 
 (def no-lighting-world (World/make-world
-                         [(Objects/make-sphere (Material/make-material (Color/make-color 1 0 0) 1 0 0 0)
+                         [(make-object :sphere (Material/make-material (Color/make-color 1 0 0) 1 0 0 0)
                                                [0 0 -1]
                                                [0 0 0]
                                                [100 0.65 0.5])
-                          (Objects/make-sphere (Material/make-material (Color/make-color 0 1 0) 1 0 0 0)
+                          (make-object :sphere (Material/make-material (Color/make-color 0 1 0) 1 0 0 0)
                                                [0 0 -1]
                                                [0 0 0]
                                                [0.65 100 0.499])]

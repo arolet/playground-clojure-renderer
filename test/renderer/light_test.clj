@@ -4,7 +4,7 @@
             [renderer.color :refer [make-color]]
             [renderer.tuple :refer [equal? make-point make-vector]]
             [renderer.material :refer [make-material]]
-            [renderer.objects :refer [make-sphere]]
+            [renderer.objects.factory :refer [make-object]]
             [renderer.ray :refer [make-ray make-intersection]]
             [renderer.world_test :refer [default-world]]))
 
@@ -19,7 +19,7 @@
 
 (deftest test-compute-intersection-state
   (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
-        sphere (make-sphere)
+        sphere (make-object :sphere)
         intersection (make-intersection ray 4 sphere)
         state (compute-intersection-state intersection (default-world))]
     (is (= 4 (:time state)))
@@ -30,20 +30,20 @@
 
 (deftest test-compute-intersection-state-acne-adjusted
   (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
-        sphere (make-sphere)
+        sphere (make-object :sphere)
         intersection (make-intersection ray 4 sphere)
         state (compute-intersection-state intersection (default-world))]
     (is (= (- -1 acne-epsilon) (nth (:point state) 2)))))
 
 (deftest test-compute-intersection-state-inside-outside
   (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
-        sphere (make-sphere)
+        sphere (make-object :sphere)
         intersection (make-intersection ray 4 sphere)
         state (compute-intersection-state intersection (default-world))]
     (is (not (:inside state)))
     )
   (let [ray (make-ray (make-point 0 0 0) (make-vector 0 0 1))
-        sphere (make-sphere)
+        sphere (make-object :sphere)
         intersection (make-intersection ray 1 sphere)
         state (compute-intersection-state intersection (default-world))]
     (is (:inside state))

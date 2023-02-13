@@ -3,7 +3,7 @@
             [renderer.color :as Color]
             [renderer.light :as Light]
             [renderer.material :refer [make-material]]
-            [renderer.objects :as Objects]
+            [renderer.objects.factory :refer [make-object sphere-kw]]
             [renderer.tuple]
             [renderer.tuple :refer [make-point make-vector]]
             [renderer.utils :refer [combine-file-names]]
@@ -14,9 +14,9 @@
 (def blue-material (make-material (Color/make-color 0.05 0.3 0.8)))
 (def yellow-material (make-material (Color/make-color 1 1 0.8)))
 
-(def spheres [(Objects/make-sphere red-material [2 0 0] [0.5 0 0] [1.25 1.25 1.25])
-              (Objects/make-sphere blue-material [1 -0.4 1] [0.5 -0.3 0] [0.33 0.25 6])
-              (Objects/make-sphere yellow-material [1 0.4 0] [0 0 0] [0.1 0.1 4])])
+(def spheres [(make-object sphere-kw red-material [2 0 0] [0.5 0 0] [1.25 1.25 1.25])
+              (make-object sphere-kw blue-material [1 -0.4 1] [0.5 -0.3 0] [0.33 0.25 6])
+              (make-object sphere-kw yellow-material [1 0.4 0] [0 0 0] [0.1 0.1 4])])
 
 (def light (Light/make-point-light (make-point -1 -1.3 -0.8)))
 
