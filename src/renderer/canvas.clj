@@ -1,7 +1,7 @@
 (ns renderer.canvas
   (:require [clojure.math :refer [round]]
             [clojure.string :as Strings]
-            [renderer.color :as Color]
+            [renderer.texture.color :as Color]
             [renderer.tuple :as Tuple]))
 
 (defrecord Canvas [data width height])

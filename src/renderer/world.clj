@@ -2,7 +2,7 @@
   (:require [renderer.objects.objects :as Objects]
             [renderer.light :as Light]
             [renderer.ray :as Ray]
-            [renderer.color :as Color]))
+            [renderer.texture.color :as Color]))
 
 (defrecord World [objects light background])
 

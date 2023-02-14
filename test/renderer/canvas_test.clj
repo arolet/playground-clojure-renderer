@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.string :as Strings]
             [renderer.canvas :refer :all]
-            [renderer.color :as Color]))
+            [renderer.texture.color :as Color]))
 
 (deftest test-blank-canvas
   (is (= [[[0 0 0] [0 0 0] [0 0 0] [0 0 0] [0 0 0]]

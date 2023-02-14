@@ -1,4 +1,4 @@
-(ns renderer.color
+(ns renderer.texture.color
   (:require [renderer.tuple :as Tuple]))
 
 (def add Tuple/add)

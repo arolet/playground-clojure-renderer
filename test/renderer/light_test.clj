@@ -1,7 +1,7 @@
 (ns renderer.light_test
   (:require [clojure.test :refer :all]
             [renderer.light :refer :all]
-            [renderer.color :refer [make-color]]
+            [renderer.texture.color :refer [make-color]]
             [renderer.tuple :refer [equal? make-point make-vector]]
             [renderer.material :refer [make-material]]
             [renderer.objects.factory :refer [make-object]]

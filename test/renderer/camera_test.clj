@@ -1,7 +1,8 @@
 (ns renderer.camera_test
   (:require [clojure.test :refer :all]
             [renderer.camera :refer :all]
-            [renderer.color :as Color]
+            [renderer.texture.color :as Color]
+            [renderer.texture.uniform :refer [uniform-texture]]
             [renderer.light :as Light]
             [renderer.material :as Material]
             [renderer.matrix :refer [->Mat make-identity mat-equal?]]
@@ -86,11 +87,11 @@
     (is (equal? (Color/make-color 0.38066 0.47583 0.2855) (nth (nth (:data canvas) 5) 5) 1e-5))))
 
 (def no-lighting-world (World/make-world
-                         [(make-object :sphere (Material/make-material (Color/make-color 1 0 0) 1 0 0 0)
+                         [(make-object :sphere (Material/make-material (uniform-texture (Color/make-color 1 0 0)) 1 0 0 0)
                                                [0 0 -1]
                                                [0 0 0]
                                                [100 0.65 0.5])
-                          (make-object :sphere (Material/make-material (Color/make-color 0 1 0) 1 0 0 0)
+                          (make-object :sphere (Material/make-material (uniform-texture (Color/make-color 0 1 0)) 1 0 0 0)
                                                [0 0 -1]
                                                [0 0 0]
                                                [0.65 100 0.499])]

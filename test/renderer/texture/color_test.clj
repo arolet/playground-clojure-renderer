@@ -1,6 +1,6 @@
-(ns renderer.color_test
+(ns renderer.texture.color_test
     (:require [clojure.test :refer :all]
-      [renderer.color :refer :all]))
+      [renderer.texture.color :refer :all]))
 
 (deftest test-make-color
   (is (equal [1 1 1] (make-color 1 1 1)))

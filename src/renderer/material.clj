@@ -1,14 +1,14 @@
 (ns renderer.material
-  (:require [renderer.color :refer [make-color]])
-  )
+  (:require [renderer.texture.color :refer [make-color]]
+            [renderer.texture.uniform :refer [uniform-texture]]))
 
-(defrecord Material [color ambient diffuse specular shininess])
+(defrecord Material [texture ambient diffuse specular shininess])
 
 (defn make-material
-  ([] (make-material (make-color 1 1 1)))
-  ([color] (make-material color 0.1))
-  ([color ambient] (make-material color ambient 0.9))
-  ([color ambient diffuse] (make-material color ambient diffuse 0.9))
-  ([color ambient diffuse specular] (make-material color ambient diffuse specular 200.0))
-  ([color ambient diffuse specular shininess] (->Material color ambient diffuse specular shininess))
+  ([] (make-material (uniform-texture (make-color 1 1 1))))
+  ([texture] (make-material texture 0.1))
+  ([texture ambient] (make-material texture ambient 0.9))
+  ([texture ambient diffuse] (make-material texture ambient diffuse 0.9))
+  ([texture ambient diffuse specular] (make-material texture ambient diffuse specular 200.0))
+  ([texture ambient diffuse specular shininess] (->Material texture ambient diffuse specular shininess))
   )

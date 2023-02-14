@@ -1,5 +1,5 @@
 (ns renderer.light
-  (:require [renderer.color :refer [make-color elem-mul]]
+  (:require [renderer.texture.color :refer [make-color elem-mul]]
             [renderer.objects.objects :refer [intersect normal-at]]
             [renderer.ray :refer [make-ray hit get-point]]
             [renderer.tuple :refer [add mul normalize remove-tuple dot add-all minus reflect norm]]))
@@ -32,7 +32,7 @@
                          inside
                          (shadowed? (:light world) (:objects world) point-adjusted))))
 
-(defn effective-color [light material] (elem-mul (:intensity light) (:color material)))
+(defn effective-color [light material] (elem-mul (:intensity light) ((:texture material))))
 
 (defn phong-ambient [effective material]
   (mul effective (:ambient material)))
