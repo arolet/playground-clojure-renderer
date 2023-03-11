@@ -1,6 +1,7 @@
 (ns renderer.scripts.draw_chap_7
   (:require [renderer.camera :refer [make-camera render view-transform]]
-            [renderer.color :as Color]
+            [renderer.texture.color :refer [make-color]]
+            [renderer.texture.uniform :refer [uniform-texture]]
             [renderer.light :as Light]
             [renderer.material :refer [make-material]]
             [renderer.objects.factory :refer [make-object sphere-kw]]
@@ -9,11 +10,12 @@
             [renderer.utils :refer [combine-file-names]]
             [renderer.world :as World]))
 
-(def background (Color/make-color 0.01 0.05 0.1))
-(def floor-material (make-material (Color/make-color 1 0.9 0.9) 0.1 0.9 0))
-(def green-material (make-material (Color/make-color 0.1 1 0.5) 0.1 0.7 0.3))
-(def green2-material (make-material (Color/make-color 0.1 1 0.5) 0.1 0.7 0.3))
-(def yellow-material (make-material (Color/make-color 1 0.8 0.1)))
+(def background (make-color 0.01 0.05 0.1))
+(def floor-material (make-material (uniform-texture (make-color 1 0.9 0.9)) 0.1 0.9 0))
+(def green-material (make-material (uniform-texture (make-color 0.1 1 0.5)) 0.1 0.7 0.3))
+(def green2-material (make-material (uniform-texture (make-color 0.1 1 0.5)) 0.1 0.7 0.3))
+(def yellow-material (make-material (uniform-texture(make-color 1 0.8 0.1))))
+
 
 (def spheres [(make-object sphere-kw floor-material [0 0 0] [0 0 0] [10 0.01 10])
               (make-object sphere-kw floor-material [0 0 5] [(/ Math/PI 2) (/ Math/PI -4) 0] [10 0.01 10])

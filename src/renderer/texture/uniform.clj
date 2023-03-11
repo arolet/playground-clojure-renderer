@@ -1,4 +1,5 @@
-(ns renderer.texture.uniform)
+(ns renderer.texture.uniform
+  (:require [renderer.texture.texture :refer [make-texture]]))
 
 (defn uniform-texture [color]
-  (fn [& _args] color))
+  (make-texture (fn [& _args] color)))

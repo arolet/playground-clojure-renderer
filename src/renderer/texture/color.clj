@@ -4,7 +4,7 @@
 (def add Tuple/add)
 (def mul Tuple/mul)
 (def remove-color Tuple/remove-tuple)
-(def equal Tuple/equal?)
+(def equal? Tuple/equal?)
 
 (defn make-color [r g b] (identity [r g b]))
 

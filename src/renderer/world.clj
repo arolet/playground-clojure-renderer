@@ -20,7 +20,7 @@
 
 (defn shade-hit [{light :light} {obj :object3d point :point eyeV :eyeV normal :normal in-shadow? :in-shadow?}]
   (Light/phong-lighting light
-                        (Objects/get-material obj)
+                        obj
                         point
                         eyeV
                         normal

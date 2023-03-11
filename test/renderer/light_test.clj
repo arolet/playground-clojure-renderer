@@ -15,6 +15,7 @@
 
 (def mater (make-material))
 (def position (make-point 0 0 0))
+(def obj (make-object :sphere mater))
 
 
 (deftest test-compute-intersection-state
@@ -26,7 +27,15 @@
     (is (= sphere (:object3d state)))
     (is (equal? (make-point 0 0 -1) (:point state)))
     (is (equal? (make-vector 0 0 -1) (:eyeV state)))
-    (is (equal? (make-vector 0 0 -1) (:normal state)))))
+    (is (equal? (make-vector 0 0 -1) (:normal state))))
+    (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
+          sphere (make-object :sphere {} [0 0 0] [0 (/ Math/PI 2) 0])
+          intersection (make-intersection ray 4 sphere)
+          state (compute-intersection-state intersection (default-world))]
+      (is (= 4 (:time state)))
+      (is (equal? (make-point 0 0 -1) (:point state)))
+      (is (equal? (make-vector 0 0 -1) (:eyeV state)))
+      (is (equal? (make-vector 0 0 -1) (:normal state)))))
 
 (deftest test-compute-intersection-state-acne-adjusted
   (let [ray (make-ray (make-point 0 0 -5) (make-vector 0 0 1))
@@ -56,10 +65,12 @@
 (deftest test-effective-color
   (is (equal? (make-color 1 1 1) (effective-color
                                  (make-point-light (make-point 0 0 -10) (make-color 1 1 1))
-                                 mater)))
+                                 obj
+                                 nil)))
   (is (equal? (make-color 1 0.9 0.7) (effective-color
                                      (make-point-light (make-point 0 0 -10) (make-color 1 0.9 0.7))
-                                     mater))))
+                                     obj
+                                     nil))))
 
 (deftest test-phong-ambient
   (is (equal? (make-color 0.1 0.1 0.1) (phong-ambient
@@ -90,37 +101,37 @@
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 0 -10) (make-color 1 1 1))]
     (is (equal? (make-color 1.9 1.9 1.9)
-                (phong-lighting light mater position toEye normal))))
+                (phong-lighting light obj position toEye normal))))
   (let [toEye (make-vector 0 sqrt2_2 (- sqrt2_2))
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 0 -10) (make-color 1 1 1))]
     (is (equal? (make-color 1 1 1)
-                (phong-lighting light mater position toEye normal))
+                (phong-lighting light obj position toEye normal))
          1e-4))
   (let [toEye (make-vector 0 0 -1)
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 10 -10) (make-color 1 1 1))]
     (is (equal? (make-color 0.7364 0.7364 0.7364)
-                (phong-lighting light mater position toEye normal)
+                (phong-lighting light obj position toEye normal)
                 1e-4)))
   (let [toEye (make-vector 0 (- sqrt2_2) (- sqrt2_2))
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 10 -10) (make-color 1 1 1))]
     (is (equal? (make-color 1.6364 1.6364 1.6364)
-                (phong-lighting light mater position toEye normal)
+                (phong-lighting light obj position toEye normal)
                 1e-4)))
   (let [toEye (make-vector 0 0 -1)
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 0 10) (make-color 1 1 1))]
     (is (equal? (make-color 0.1 0.1 0.1)
-                (phong-lighting light mater position toEye normal)
+                (phong-lighting light obj position toEye normal)
                 1e-4))))
 
 (deftest test-phong-lighting-in-shadow
   (let [toEye (make-vector 0 0 -1)
         normal (make-vector 0 0 -1)
         light (make-point-light (make-point 0 0 -10) (make-color 1 1 1))]
-  (is (equal? (make-color 0.1 0.1 0.1) (phong-lighting light mater position toEye normal true)))))
+  (is (equal? (make-color 0.1 0.1 0.1) (phong-lighting light obj position toEye normal true)))))
 
 (deftest test-shadowed?
   (let [world (default-world)

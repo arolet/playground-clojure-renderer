@@ -1,6 +1,7 @@
 (ns renderer.light
   (:require [renderer.texture.color :refer [make-color elem-mul]]
-            [renderer.objects.objects :refer [intersect normal-at]]
+            [renderer.texture.texture :refer [sample-texture]]
+            [renderer.objects.objects :refer [intersect normal-at to-local get-material]]
             [renderer.ray :refer [make-ray hit get-point]]
             [renderer.tuple :refer [add mul normalize remove-tuple dot add-all minus reflect norm]]))
 
@@ -32,7 +33,9 @@
                          inside
                          (shadowed? (:light world) (:objects world) point-adjusted))))
 
-(defn effective-color [light material] (elem-mul (:intensity light) ((:texture material))))
+(defn effective-color [light obj point]
+  (elem-mul (:intensity light)
+            (sample-texture (:texture (get-material obj)) obj point)))
 
 (defn phong-ambient [effective material]
   (mul effective (:ambient material)))
@@ -50,10 +53,11 @@
               (Math/pow lightToEyeCosine (:shininess material)))))))
 
 (defn phong-lighting
-  ([light material point toEye normal]
-   (phong-lighting light material point toEye normal false))
-  ([light material point toEye normal in-shadow?]
-   (let [effective (effective-color light material)
+  ([light obj point toEye normal]
+   (phong-lighting light obj point toEye normal false))
+  ([light obj point toEye normal in-shadow?]
+   (let [effective (effective-color light obj point)
+         material (get-material obj)
          ambient (phong-ambient effective material)
          toLight (normalize (remove-tuple (:position light) point))
          eyeLightCos (dot toLight normal)]

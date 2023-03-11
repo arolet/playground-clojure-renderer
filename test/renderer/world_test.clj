@@ -1,13 +1,15 @@
 (ns renderer.world_test
   (:require [clojure.test :refer :all]
-            [renderer.world :refer :all]
-            [renderer.ray :refer [make-ray make-intersection]]
-            [renderer.light :refer [make-point-light compute-intersection-state]]
-            [renderer.tuple :refer [make-point make-vector equal?]]
-            [renderer.texture.color :refer [make-color]]
-            [renderer.texture.uniform :refer [uniform-texture]]
+            [renderer.light :refer [compute-intersection-state make-point-light]]
+            [renderer.material :refer [make-material]]
+            [renderer.matrix :refer [make-identity]]
             [renderer.objects.factory :refer [make-object]]
-            [renderer.material :refer [make-material]]))
+            [renderer.ray :refer [make-intersection make-ray]]
+            [renderer.texture.color :refer [make-color]]
+            [renderer.texture.stripes :refer [stripes]]
+            [renderer.texture.uniform :refer [uniform-texture]]
+            [renderer.tuple :refer [equal? make-point make-vector]]
+            [renderer.world :refer :all]))
 
 (deftest test-empty-world
   (is (= [] (:objects (make-world))))
@@ -17,12 +19,12 @@
   (let [obj (make-object :sphere)]
     (is (some #(= obj %) (:objects (add-object (make-world) obj)))))
   (let [obj (make-object :sphere {:a 1})]
-  (is (some #(= obj %) (:objects (add-object (add-object (make-world) (make-object :sphere)) obj))))))
+    (is (some #(= obj %) (:objects (add-object (add-object (make-world) (make-object :sphere)) obj))))))
 
 (defn default-world
   ([] (default-world (make-point-light (make-point -10 10 -10))))
   ([light] (make-world [(make-object :sphere (make-material (uniform-texture (make-color 0.8 1 0.6)) 0.1 0.7 0.2))
-                   (make-object :sphere (make-material) [0 0 0] [0 0 0] [0.5 0.5 0.5])]
+                        (make-object :sphere (make-material) [0 0 0] [0 0 0] [0.5 0.5 0.5])]
                        light)))
 
 (deftest test-intersect-world
@@ -62,3 +64,15 @@
               (color-at (default-world) (make-ray (make-point 0 0 -5) (make-vector 0 0 1))) 1e-5))
   (is (equal? (make-color 0.1 0.1 0.1)
               (color-at (default-world) (make-ray (make-point 0 0 0.75) (make-vector 0 0 -1))))))
+
+(deftest test-color-at-striped-plane
+  (let [on (make-color 1 0 0)
+        off (make-color 0 1 0)
+        texture (stripes (make-identity 4) true on off)
+        plane (make-object :plane (make-material texture 1 0 0 0))
+        world (make-world [plane] (make-point-light (make-point 0 10 0)))
+        eye (make-point 0 1 0)]
+    (is (equal? on (color-at world (make-ray eye (make-vector 0 -1 0) true))))
+    (is (equal? off (color-at world (make-ray eye (make-vector 1 -1 0) true))))
+    (is (equal? off (color-at world (make-ray eye (make-vector 1.1 -1 0) true))))
+    ))

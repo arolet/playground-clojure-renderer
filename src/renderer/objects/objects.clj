@@ -27,6 +27,9 @@
 (defn get-inverted-transpose [obj]
   (:inverted-transpose (:config obj)))
 
+(defn to-local [obj pt]
+  (m-dot-vec (get-inverted obj) pt))
+
 (defn add-object-to-hits [hits obj ray]
   (mapv (fn [inter] (Ray/make-intersection ray (:time inter) obj))
         hits))
