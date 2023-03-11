@@ -3,20 +3,21 @@
             [renderer.texture.color :refer [equal? make-color]]
             [renderer.texture.stripes :refer :all]
             [renderer.texture.texture :refer [sample-texture]]
-            [renderer.transformation :refer [rotation-xyz]]
+            [renderer.transformation :refer [rotation-xyz scaling]]
+            [renderer.matrix :refer [make-identity]]
             [renderer.tuple :refer [make-point]]))
 
 (deftest test-default-stripes
   (let [text (stripes)]
-  (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 0 0))))
-  (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 0 0))))
-  (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 1 0))))
-  (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 2 1))))
-  (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 3 2))))
-  (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 4 3))))
-  (is (equal? (make-color 0 0 0) (sample-texture text (make-point -0.5 0 0))))
-  (is (equal? (make-color 0 0 0) (sample-texture text (make-point -1 4 3))))
-  (is (equal? (make-color 1 1 1) (sample-texture text (make-point -1.5 4 3))))))
+    (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 0 0))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 0 0))))
+    (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 1 0))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 2 1))))
+    (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 3 2))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 4 3))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point -0.5 0 0))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point -1 4 3))))
+    (is (equal? (make-color 1 1 1) (sample-texture text (make-point -1.5 4 3))))))
 
 (deftest test-stripes
   (let [transform (rotation-xyz 0 0 0)
@@ -37,4 +38,14 @@
     (is (equal? (make-color 1 1 1) (sample-texture text (make-point 0 0 0))))
     (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 0 0))))
     (is (equal? (make-color 1 1 1) (sample-texture text (make-point 1 0 1))))
+    ))
+
+(deftest test-composed
+  (let [text (checker (make-identity 4)
+                      true
+                      (stripes (scaling 2 2 2) true (make-color 1 0 0) (make-color 0 1 0))
+                      (make-color 0 0 0))]
+    (is (equal? (make-color 1 0 0) (sample-texture text (make-point 0 0 0))))
+    (is (equal? (make-color 0 1 0) (sample-texture text (make-point 0.6 0 0))))
+    (is (equal? (make-color 0 0 0) (sample-texture text (make-point 1 0 0))))
     ))

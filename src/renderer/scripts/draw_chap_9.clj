@@ -3,7 +3,7 @@
             [renderer.texture.color :refer [make-color]]
             [renderer.texture.stripes :refer [stripes checker]]
             [renderer.texture.uniform :refer [uniform-texture]]
-            [renderer.transformation :refer [scaling]]
+            [renderer.transformation :refer [scaling rotation-xyz chain]]
             [renderer.light :as Light]
             [renderer.material :refer [make-material]]
             [renderer.objects.factory :refer [make-object sphere-kw plane-kw]]
@@ -14,10 +14,20 @@
 
 (def background (make-color 0.01 0.05 0.1))
 (def floor-material (make-material (stripes (scaling 1 1 1) false (make-color 1 0.9 0.9) (make-color 0.2 0.1 0.1)) 0.1 0.9 0))
-(def wall-material (make-material (checker (scaling 0.333 0.333 0.333) true (make-color 1 0.9 0.9) (make-color 0.2 0.1 0.1)) 0.1 0.9 0))
+(def wall-material (make-material (checker (scaling 0.333 0.333 0.333)
+                                           true
+                                           (stripes (chain (scaling 6 6 6) (rotation-xyz 0 (/ Math/PI 4) 0))
+                                                    true
+                                                    (make-color 1 0.9 0.9)
+                                                    (make-color 0.2 0.1 0.1))
+                                           (stripes (chain (scaling 6 6 6) (rotation-xyz 0 (/ Math/PI (- 4)) 0))
+                                                    true
+                                                    (make-color 1 0.9 0.9)
+                                                    (make-color 0.2 0.1 0.1)))
+                                  0.1 0.9 0))
 (def green-material (make-material (uniform-texture (make-color 0.1 1 0.5)) 0.1 0.7 0.3))
 (def green2-material (make-material (uniform-texture (make-color 0.1 1 0.5)) 0.1 0.7 0.3))
-(def yellow-material (make-material (uniform-texture(make-color 1 0.8 0.1))))
+(def yellow-material (make-material (uniform-texture (make-color 1 0.8 0.1))))
 
 (def spheres [(make-object plane-kw floor-material)
               (make-object plane-kw wall-material [2 0 0] [0 0 (/ Math/PI 2)])

@@ -11,13 +11,14 @@
 
 (defn sample-texture
   ([text point]
-   (let [fun (:fun text)
-         point (if (:use-transform? text)
-                 (m-dot-vec (:transform text) point)
-                 point)]
-     (fun point))
-   )
+   (if (contains? text :fun)
+     (let [fun (:fun text)
+           point (if (:use-transform? text)
+                   (m-dot-vec (:transform text) point)
+                   point)]
+       (sample-texture (fun point) point))
+     text))
   ([text obj point]
-  (if (:local-coordinates? text)
-    (sample-texture text (to-local obj point))
-    (sample-texture text point))))
+   (if (:local-coordinates? text)
+     (sample-texture text (to-local obj point))
+     (sample-texture text point))))
